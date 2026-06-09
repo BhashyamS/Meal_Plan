@@ -249,6 +249,42 @@ DEFAULT_DAY_PLAN = {
     "Dinner": {"Drink": "Water", "Main": "Rotisserie chicken portion", "Side": "Whole wheat bagel", "Dessert/Treat": "Greek yogurt"},
 }
 
+# Meal-specific dropdown rules.
+# This prevents breakfast from showing lunch/dinner foods and keeps the app cleaner for the client.
+MEAL_ALLOWED_OPTIONS = {
+    "Breakfast": {
+        "Drink": ["None", "Protein iced coffee", "Regular cold coffee", "Whole milk", "Water"],
+        "Main": ["None", "Peanut butter bagel", "Greek yogurt + granola bowl"],
+        "Side": ["None", "Banana", "2 boiled eggs", "Protein bar"],
+        "Dessert/Treat": ["None", "Greek yogurt", "Granola serving", "Protein bar", "Banana"],
+    },
+    "Lunch": {
+        "Drink": ["None", "Water", "Regular cold coffee"],
+        "Main": [
+            "None",
+            "Subway Footlong Turkey",
+            "Subway Footlong Rotisserie Chicken",
+            "Grocery store deli sandwich",
+            "Vitality Bowl protein wrap",
+            "Jersey Mike's Giant Turkey Sub",
+        ],
+        "Side": ["None", "Protein bar", "Banana", "Trail mix"],
+        "Dessert/Treat": ["None", "Greek yogurt", "Protein bar", "Banana"],
+    },
+    "Snack": {
+        "Drink": ["None", "Water", "Whole milk", "Regular cold coffee"],
+        "Main": ["None", "Greek yogurt + granola bowl", "Peanut butter bagel"],
+        "Side": ["None", "Trail mix", "Banana", "Protein bar", "2 boiled eggs"],
+        "Dessert/Treat": ["None", "Greek yogurt", "Granola serving", "Protein bar", "Banana"],
+    },
+    "Dinner": {
+        "Drink": ["None", "Water", "Whole milk"],
+        "Main": ["None", "Rotisserie chicken portion", "Grocery store deli sandwich", "Vitality Bowl protein wrap"],
+        "Side": ["None", "Whole wheat bagel", "Rice cup", "Whole wheat bread serving", "2 boiled eggs"],
+        "Dessert/Treat": ["None", "Greek yogurt", "Protein bar", "Banana"],
+    },
+}
+
 GENERAL_MONTHLY = [
     {"Item": "Whey protein", "Category": "Monthly", "Suggested Qty": 1, "Unit": "tub", "Default Price": 60.00, "Storage": "Room temp", "Low Stock At": 10},
     {"Item": "Peanut butter", "Category": "Monthly", "Suggested Qty": 1, "Unit": "large jar", "Default Price": 10.00, "Storage": "Room temp", "Low Stock At": 4},
@@ -608,7 +644,10 @@ def save_day(plan_date, selections, deduct=True):
 # =========================================================
 # APP HELPERS
 # =========================================================
-def component_names(slot):
+def component_names(slot, meal_slot=None):
+    if meal_slot and meal_slot in MEAL_ALLOWED_OPTIONS:
+        allowed = MEAL_ALLOWED_OPTIONS[meal_slot].get(slot, [])
+        return allowed + ["Other / Custom"]
     return [x["name"] for x in COMPONENTS[slot]] + ["Other / Custom"]
 
 def get_component(slot, name):
@@ -844,7 +883,7 @@ elif page == "🍽️ Meal Builder":
             cols = st.columns(4)
             for i, component_slot in enumerate(COMPONENT_SLOTS):
                 with cols[i]:
-                    options = component_names(component_slot)
+                    options = component_names(component_slot, meal_slot)
                     default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
                     default_index = options.index(default_name) if default_name in options else 0
 
