@@ -27,7 +27,7 @@ st.markdown("""
         margin-top: 0px;
     }
     .section-card {
-        background-color: #FFF7E6;
+        background: linear-gradient(135deg, #FFF7E6, #FCEFCB);
         padding: 18px;
         border-radius: 18px;
         border: 1px solid #F4D28A;
