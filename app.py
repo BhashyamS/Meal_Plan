@@ -1,67 +1,103 @@
+import random
 import streamlit as st
 import pandas as pd
 
-# -----------------------------
+# ---------------------------------------------------------
 # Page Setup
-# -----------------------------
+# ---------------------------------------------------------
 st.set_page_config(
     page_title="Pooh Bear Yum Yum Tracker",
     page_icon="🐻",
     layout="wide"
 )
 
-# -----------------------------
-# Custom CSS
-# -----------------------------
+# ---------------------------------------------------------
+# Styling
+# ---------------------------------------------------------
 st.markdown("""
 <style>
     .main-title {
-        font-size: 42px;
-        font-weight: 800;
-        color: #5C3B1E;
+        font-size: 46px;
+        font-weight: 900;
+        color: #F4C542;
         margin-bottom: 0px;
     }
+
     .subtitle {
         font-size: 18px;
-        color: #7A5A32;
+        color: #E8D8B8;
         margin-top: 0px;
+        margin-bottom: 25px;
     }
+
     .section-card {
         background: linear-gradient(135deg, #FFF7E6, #FCEFCB);
-        padding: 18px;
+        color: #3B2A1A;
+        padding: 22px;
         border-radius: 18px;
         border: 1px solid #F4D28A;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+        font-size: 17px;
+        line-height: 1.7;
+    }
+
+    .section-card h3 {
+        color: #5C3B1E;
+        margin-top: 0;
+    }
+
+    .meal-card {
+        background: #FFF7E6;
+        color: #3B2A1A;
+        padding: 18px;
+        border-radius: 16px;
+        border: 1px solid #F4D28A;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+
+    .meal-card h4 {
+        margin-top: 0;
+        color: #5C3B1E;
+    }
+
+    .note-box {
+        background: #1E1E1E;
+        border-left: 5px solid #F4C542;
+        padding: 16px;
+        border-radius: 10px;
         margin-bottom: 15px;
     }
-    .meal-card {
-        background-color: #FFFFFF;
-        padding: 16px;
-        border-radius: 15px;
-        border: 1px solid #E8D8B8;
-        margin-bottom: 12px;
+
+    .small-muted {
+        color: #B8B8B8;
+        font-size: 14px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
-# Data
-# -----------------------------
+# ---------------------------------------------------------
+# Client Data
+# ---------------------------------------------------------
 client = {
     "name": "Pooh Bear",
-    "goal": "Lean Bulk",
+    "prepared_by": "Srija Bhashyam",
+    "plan_type": "Lean Bulk",
+    "age": 27,
     "height": "6'0",
     "weight": "180 lb",
-    "age": 27,
-    "daily_calorie_target": "3,600–4,000",
-    "daily_protein_target": "180–220g",
+    "calorie_target": "3,600–4,000/day",
+    "protein_target": "180–220g/day",
     "weekly_budget": 150,
-    "constraints": "Driving job, mini fridge only, low prep, lower sugar/sodium"
+    "lifestyle": "Driving job, mini fridge only, no kitchen, low-prep meals",
+    "nutrition_focus": "High protein, balanced calories, lower sugar, lower sodium where possible"
 }
 
 meal_plan = [
     {
         "Day": "Monday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Subway Footlong Turkey",
         "Snack": "Greek yogurt + granola + trail mix",
         "Dinner": "Rotisserie chicken + whole wheat bagel",
@@ -73,7 +109,7 @@ meal_plan = [
     },
     {
         "Day": "Tuesday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Grocery store deli sandwich + protein bar",
         "Snack": "Trail mix + banana",
         "Dinner": "Rotisserie chicken + rice cup",
@@ -85,7 +121,7 @@ meal_plan = [
     },
     {
         "Day": "Wednesday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Vitality Bowl protein wrap + protein bar",
         "Snack": "Greek yogurt + granola",
         "Dinner": "Rotisserie chicken + whole wheat bread",
@@ -97,7 +133,7 @@ meal_plan = [
     },
     {
         "Day": "Thursday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Subway Footlong Rotisserie Chicken",
         "Snack": "Trail mix + banana",
         "Dinner": "Rotisserie chicken + whole wheat bagel",
@@ -109,7 +145,7 @@ meal_plan = [
     },
     {
         "Day": "Friday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Grocery store turkey sandwich + protein bar",
         "Snack": "Greek yogurt + granola",
         "Dinner": "Rotisserie chicken + rice cup",
@@ -121,7 +157,7 @@ meal_plan = [
     },
     {
         "Day": "Saturday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Jersey Mike's Giant Turkey Sub",
         "Snack": "Trail mix + banana",
         "Dinner": "Rotisserie chicken + whole wheat bagel",
@@ -133,7 +169,7 @@ meal_plan = [
     },
     {
         "Day": "Sunday",
-        "Breakfast": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
+        "Breakfast": "Protein iced coffee + peanut butter bagel + banana + 2 boiled eggs",
         "Lunch": "Grocery store sandwich + protein bar",
         "Snack": "Greek yogurt + granola + trail mix",
         "Dinner": "Rotisserie chicken + whole wheat bread",
@@ -159,29 +195,28 @@ weekly_grocery = [
     {"Item": "Bananas", "Quantity": "10–14", "Storage": "Room temp", "Estimated Cost": 4},
     {"Item": "Greek yogurt", "Quantity": "1 pack/tub", "Storage": "Mini fridge", "Estimated Cost": 8},
     {"Item": "Pre-boiled eggs", "Quantity": "1 pack", "Storage": "Mini fridge", "Estimated Cost": 7},
-    {"Item": "Rotisserie chicken", "Quantity": "2 chickens, buy every 2–3 days", "Storage": "Mini fridge", "Estimated Cost": 10},
-    {"Item": "Rice cups or whole wheat bread", "Quantity": "1 pack", "Storage": "Room temp", "Estimated Cost": 5},
+    {"Item": "Rotisserie chicken", "Quantity": "2 chickens; buy every 2–3 days", "Storage": "Mini fridge", "Estimated Cost": 10},
+    {"Item": "Rice cups / whole wheat bread", "Quantity": "1 pack", "Storage": "Room temp", "Estimated Cost": 5},
+]
+
+swap_options = [
+    {"Swap": "Replace Jersey Mike's with grocery sandwich", "Savings": 8, "Impact": "Lower cost, slightly less protein"},
+    {"Swap": "Replace Vitality Bowl with Subway", "Savings": 1, "Impact": "More protein, similar cost"},
+    {"Swap": "Replace protein bar with boiled eggs", "Savings": 0.50, "Impact": "Less processed, lower sugar"},
+    {"Swap": "Use rice cup instead of bread", "Savings": 0, "Impact": "Lower sodium option"},
 ]
 
 df = pd.DataFrame(meal_plan)
 monthly_df = pd.DataFrame(monthly_grocery)
 weekly_df = pd.DataFrame(weekly_grocery)
+swap_df = pd.DataFrame(swap_options)
 
-# -----------------------------
-# Header
-# -----------------------------
-st.markdown('<p class="main-title">🐻 Pooh Bear Yum Yum Tracker</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">A dynamic lean-bulk meal plan dashboard for a busy client on the road.</p>', unsafe_allow_html=True)
-
-# -----------------------------
+# ---------------------------------------------------------
 # Sidebar
-# -----------------------------
-st.sidebar.title("🐝 Client Controls")
+# ---------------------------------------------------------
+st.sidebar.title("🐻 Pooh Controls")
 
-selected_day = st.sidebar.selectbox(
-    "Choose a day",
-    df["Day"].tolist()
-)
+selected_day = st.sidebar.selectbox("Select Day", df["Day"].tolist())
 
 budget_limit = st.sidebar.number_input(
     "Weekly Budget Goal ($)",
@@ -191,14 +226,32 @@ budget_limit = st.sidebar.number_input(
     step=5
 )
 
-st.sidebar.markdown("---")
-st.sidebar.write("**Client Goal:**", client["goal"])
-st.sidebar.write("**Constraint:** Mini fridge only")
-st.sidebar.write("**Priority:** Budget + convenience")
+quotes = [
+    "🍯 When in doubt, eat the bagel.",
+    "💪 A bear who skips protein skips gains.",
+    "🐻 Small fridge. Big goals.",
+    "🥜 Peanut butter is the budget bulk king.",
+    "🚗 Road meals can still build muscle."
+]
+st.sidebar.info(random.choice(quotes))
 
-# -----------------------------
+st.sidebar.markdown("---")
+st.sidebar.write("**Goal:** Lean Bulk")
+st.sidebar.write("**Budget:** $150/week")
+st.sidebar.write("**Setup:** Mini fridge only")
+
+# ---------------------------------------------------------
+# Header
+# ---------------------------------------------------------
+st.markdown('<p class="main-title">🐻 Pooh Bear Yum Yum Tracker</p>', unsafe_allow_html=True)
+st.markdown(
+    '<p class="subtitle">Dynamic client meal plan report for lean bulking on the road, with mini-fridge-friendly groceries and budget tracking.</p>',
+    unsafe_allow_html=True
+)
+
+# ---------------------------------------------------------
 # Tabs
-# -----------------------------
+# ---------------------------------------------------------
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🏠 Overview",
     "📅 Weekly Plan",
@@ -207,140 +260,161 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "💰 Budget"
 ])
 
-# -----------------------------
-# Overview Tab
-# -----------------------------
+# ---------------------------------------------------------
+# Overview
+# ---------------------------------------------------------
 with tab1:
-    st.subheader("Client Overview")
+    st.subheader("Executive Summary")
 
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Goal", client["goal"])
-    col2.metric("Calories", client["daily_calorie_target"])
-    col3.metric("Protein", client["daily_protein_target"])
+    col1.metric("Goal", client["plan_type"])
+    col2.metric("Calories", client["calorie_target"])
+    col3.metric("Protein", client["protein_target"])
     col4.metric("Budget", f"${budget_limit}/week")
 
-    st.markdown("### Client Profile")
     st.markdown(f"""
     <div class="section-card">
-    <b>Name:</b> {client['name']}<br>
-    <b>Age:</b> {client['age']}<br>
-    <b>Height:</b> {client['height']}<br>
-    <b>Weight:</b> {client['weight']}<br>
-    <b>Notes:</b> {client['constraints']}
+        <h3>🐻 Client Information</h3>
+        <b>Name:</b> {client['name']}<br>
+        <b>Age:</b> {client['age']}<br>
+        <b>Height:</b> {client['height']}<br>
+        <b>Weight:</b> {client['weight']}<br>
+        <b>Prepared By:</b> {client['prepared_by']}<br>
+        <b>Lifestyle:</b> {client['lifestyle']}<br>
+        <b>Nutrition Focus:</b> {client['nutrition_focus']}
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown("### Plan Strategy")
+    st.markdown("""
+    <div class="note-box">
+    This plan is built around a consistent high-protein breakfast, handheld road-friendly lunches,
+    portable snacks, and easy dinners based around rotisserie chicken. The grocery strategy protects
+    mini-fridge space by keeping most items shelf-stable: whey, bagels, peanut butter, bananas,
+    trail mix, granola, and protein bars.
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### Nutrition Guardrails")
     st.write(
-        "This plan uses low-prep, road-friendly meals with high-calorie breakfast, "
-        "handheld lunches, compact mini-fridge groceries, and easy dinners based around "
-        "rotisserie chicken. The plan avoids relying heavily on high-sugar foods and tries "
-        "to reduce sodium by limiting deli meats, fast food, and processed sides."
+        "The plan avoids making high-sugar foods the foundation. Hawaiian rolls and pizza are not used as daily staples. "
+        "Sodium is managed by rotating restaurant meals with grocery sandwiches, rice cups, whole wheat bread, and rotisserie chicken."
     )
 
-# -----------------------------
-# Weekly Plan Tab
-# -----------------------------
+# ---------------------------------------------------------
+# Weekly Plan
+# ---------------------------------------------------------
 with tab2:
     st.subheader("Weekly Meal Plan")
 
-    display_df = df[["Day", "Breakfast", "Lunch", "Snack", "Dinner", "Calories", "Protein_g", "Cost"]]
+    display_df = df[[
+        "Day", "Breakfast", "Lunch", "Snack", "Dinner",
+        "Calories", "Protein_g", "Carbs_g", "Fat_g", "Cost"
+    ]]
+
     st.dataframe(display_df, use_container_width=True, hide_index=True)
 
-    st.markdown("### Weekly Totals")
+    st.markdown("### Weekly Nutrition Summary")
+    col1, col2, col3, col4, col5 = st.columns(5)
+    col1.metric("Calories", f"{df['Calories'].sum():,}")
+    col2.metric("Protein", f"{df['Protein_g'].sum():,}g")
+    col3.metric("Carbs", f"{df['Carbs_g'].sum():,}g")
+    col4.metric("Fat", f"{df['Fat_g'].sum():,}g")
+    col5.metric("Cost", f"${df['Cost'].sum():.2f}")
+
+    st.markdown("### Average Per Day")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Weekly Calories", f"{df['Calories'].sum():,}")
-    col2.metric("Weekly Protein", f"{df['Protein_g'].sum():,}g")
-    col3.metric("Weekly Cost", f"${df['Cost'].sum():.2f}")
+    col1.metric("Avg Calories", f"{df['Calories'].mean():,.0f}")
+    col2.metric("Avg Protein", f"{df['Protein_g'].mean():.0f}g")
+    col3.metric("Avg Cost", f"${df['Cost'].mean():.2f}")
 
-# -----------------------------
-# Day Details Tab
-# -----------------------------
+# ---------------------------------------------------------
+# Day Details
+# ---------------------------------------------------------
 with tab3:
-    st.subheader(f"{selected_day} Meal Details")
-
     day_data = df[df["Day"] == selected_day].iloc[0]
 
-    col1, col2, col3, col4 = st.columns(4)
+    st.subheader(f"{selected_day} Meal Details")
+
+    col1, col2, col3, col4, col5 = st.columns(5)
     col1.metric("Calories", f"{day_data['Calories']:,}")
     col2.metric("Protein", f"{day_data['Protein_g']}g")
     col3.metric("Carbs", f"{day_data['Carbs_g']}g")
     col4.metric("Fat", f"{day_data['Fat_g']}g")
+    col5.metric("Cost", f"${day_data['Cost']:.2f}")
 
-    st.metric("Estimated Cost", f"${day_data['Cost']:.2f}")
-
-    meals = {
-        "Breakfast": day_data["Breakfast"],
-        "Lunch": day_data["Lunch"],
-        "Snack": day_data["Snack"],
-        "Dinner": day_data["Dinner"]
+    meal_notes = {
+        "Breakfast": "High-protein, high-calorie start with whey, milk, peanut butter, eggs, and fruit.",
+        "Lunch": "Designed to be road-friendly, handheld, and less messy than rice bowls.",
+        "Snack": "Portable calories to prevent under-eating during a driving shift.",
+        "Dinner": "Rotisserie chicken is saved for dinner because it is easier to eat at home."
     }
 
-    for meal_name, meal_text in meals.items():
-        with st.expander(f"{meal_name}: {meal_text}", expanded=True):
-            if meal_name == "Breakfast":
-                st.write("Built around protein coffee, peanut butter bagel, banana, and boiled eggs.")
-                st.write("Purpose: high-calorie start, strong protein, low prep.")
-            elif meal_name == "Lunch":
-                st.write("Road-friendly and handheld where possible.")
-                st.write("Purpose: easy to eat while driving or during a short break.")
-            elif meal_name == "Snack":
-                st.write("Portable calories to prevent under-eating.")
-                st.write("Purpose: help hit calorie goal without a messy meal.")
-            else:
-                st.write("Dinner uses rotisserie chicken because it is easier to eat at home.")
-                st.write("Purpose: cheap high-protein meal with simple carbs.")
+    for meal_name in ["Breakfast", "Lunch", "Snack", "Dinner"]:
+        st.markdown(f"""
+        <div class="meal-card">
+            <h4>{meal_name}</h4>
+            <b>{day_data[meal_name]}</b><br><br>
+            {meal_notes[meal_name]}
+        </div>
+        """, unsafe_allow_html=True)
 
-# -----------------------------
-# Grocery List Tab
-# -----------------------------
+# ---------------------------------------------------------
+# Grocery List
+# ---------------------------------------------------------
 with tab4:
-    st.subheader("Monthly Costco Purchase")
+    st.subheader("Monthly Costco Buy — 1st of the Month")
     st.dataframe(monthly_df, use_container_width=True, hide_index=True)
 
-    st.subheader("Weekly Grocery Refill")
+    monthly_total = monthly_df["Estimated Cost"].sum()
+    st.metric("Estimated Monthly Bulk Purchase", f"${monthly_total:.2f}")
+
+    st.subheader("Weekly Refill List")
     st.dataframe(weekly_df, use_container_width=True, hide_index=True)
 
-    st.markdown("### Mini Fridge Priority")
-    st.write(
-        "Keep fridge space for milk, Greek yogurt, boiled eggs, and the current rotisserie chicken. "
-        "Store whey, bagels, peanut butter, bananas, granola, trail mix, protein bars, rice cups, "
-        "and bread outside the fridge."
-    )
+    weekly_total = weekly_df["Estimated Cost"].sum()
+    st.metric("Estimated Weekly Grocery Refill", f"${weekly_total:.2f}")
 
-# -----------------------------
-# Budget Tab
-# -----------------------------
+    st.markdown("### Mini Fridge Storage Plan")
+    st.markdown("""
+    <div class="section-card">
+        <h3>🧊 What Goes in the Mini Fridge</h3>
+        <b>Priority Items:</b> milk, Greek yogurt, boiled eggs, and the current rotisserie chicken.<br>
+        <b>Do Not Waste Fridge Space On:</b> bagels, peanut butter, bananas, whey, trail mix, granola, protein bars, rice cups, or bread.<br>
+        <b>Rotisserie Chicken Strategy:</b> Buy one chicken every 2–3 days instead of storing multiple chickens.
+    </div>
+    """, unsafe_allow_html=True)
+
+# ---------------------------------------------------------
+# Budget
+# ---------------------------------------------------------
 with tab5:
-    st.subheader("Budget Summary")
+    st.subheader("Honey Pot Budget Tracker 🍯")
 
-    weekly_food_cost = df["Cost"].sum()
-    remaining = budget_limit - weekly_food_cost
-    progress = min(weekly_food_cost / budget_limit, 1.0)
+    weekly_cost = df["Cost"].sum()
+    remaining = budget_limit - weekly_cost
+    progress = min(weekly_cost / budget_limit, 1.0)
 
     col1, col2, col3 = st.columns(3)
-    col1.metric("Weekly Meal Cost", f"${weekly_food_cost:.2f}")
+    col1.metric("Projected Weekly Cost", f"${weekly_cost:.2f}")
     col2.metric("Budget Goal", f"${budget_limit:.2f}")
     col3.metric("Remaining", f"${remaining:.2f}")
 
     st.progress(progress)
 
-    if weekly_food_cost <= budget_limit:
-        st.success("The plan is within the weekly budget. Pooh Bear's honey pot is safe. 🍯")
+    if weekly_cost <= budget_limit:
+        st.success("Plan is within budget. Pooh Bear's honey pot is safe. 🍯")
     else:
-        st.error("The plan is over budget. Swap one restaurant lunch for a grocery sandwich or rotisserie chicken meal.")
+        st.error("Plan is over budget. Use the swaps below to reduce weekly cost.")
 
-    st.markdown("### Budget Notes")
-    st.write("""
-    To lower the weekly cost:
-    - Replace Jersey Mike's with a grocery store deli sandwich.
-    - Replace Vitality Bowl with Subway or a grocery sandwich.
-    - Use whey protein instead of ready-to-drink shakes.
-    - Buy rotisserie chicken every 2–3 days instead of storing multiple chickens.
-    """)
+    st.markdown("### Budget-Friendly Swaps")
+    st.dataframe(swap_df, use_container_width=True, hide_index=True)
 
-# -----------------------------
-# Footer
-# -----------------------------
+    st.markdown("### Cost Notes")
+    st.write(
+        "The biggest savings come from using whey protein instead of ready-to-drink shakes, "
+        "buying peanut butter and trail mix in bulk, and limiting premium lunches like Jersey Mike's or Vitality Bowls."
+    )
+
 st.markdown("---")
-st.caption("Pooh Bear Yum Yum Tracker • Lean bulk meal planning dashboard • Built with Streamlit")
+st.caption("Pooh Bear Yum Yum Tracker • Dynamic meal plan report • Built with Streamlit")
