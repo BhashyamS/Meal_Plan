@@ -503,6 +503,26 @@ def get_component(component_slot, name):
             return item
     return COMPONENTS[component_slot][0]
 
+
+def get_checkbox_default(saved_day, meal_slot, component_slot, component_name):
+    """
+    Checkbox default logic:
+    1. If the date was already saved, only saved components are checked.
+    2. If the date has not been saved, use the example DEFAULT_DAY_PLAN.
+    """
+    saved_keys_for_meal = [
+        key for key in saved_day.keys()
+        if key[0] == meal_slot and key[1] == component_slot
+    ]
+
+    # If this component slot has saved data, only check saved items
+    if saved_keys_for_meal:
+        return saved_day.get((meal_slot, component_slot)) == component_name
+
+    # Otherwise use example default plan
+    return DEFAULT_DAY_PLAN[meal_slot][component_slot] == component_name
+
+
 def calculate_totals(selected_components):
     totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
     for comp in selected_components:
@@ -517,9 +537,9 @@ def rows_from_selections(plan_date, selections):
     rows = []
     saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    for meal_slot, components in selections.items():
-        for component_slot, component in components.items():
-            if component["name"] != "None":
+    for meal_slot, component_groups in selections.items():
+        for component_slot, component_list in component_groups.items():
+            for component in component_list:
                 rows.append({
                     "saved_at": saved_at,
                     "plan_date": str(plan_date),
@@ -538,10 +558,11 @@ def rows_from_selections(plan_date, selections):
 def build_dynamic_grocery(selections):
     groceries = {}
 
-    for meal_components in selections.values():
-        for component in meal_components.values():
-            for ingredient, qty in component["ingredients"].items():
-                groceries[ingredient] = groceries.get(ingredient, 0) + qty
+    for meal_component_groups in selections.values():
+        for component_list in meal_component_groups.values():
+            for component in component_list:
+                for ingredient, qty in component["ingredients"].items():
+                    groceries[ingredient] = groceries.get(ingredient, 0) + qty
 
     rows = [{"Item": item, "Estimated Amount": qty} for item, qty in groceries.items()]
     return pd.DataFrame(rows).sort_values("Item") if rows else pd.DataFrame(columns=["Item", "Estimated Amount"])
@@ -661,42 +682,53 @@ selections = {}
 
 with tab2:
     st.subheader(f"Daily Meal Builder — {selected_date.strftime('%A, %b %d, %Y')}")
-    st.caption("Each meal starts with an example selection. The client can edit any component.")
+    st.caption(
+        "Check the items the client actually wants for that day. "
+        "Only checked items count toward macros, grocery list, budget, and Google Sheets saving."
+    )
 
     for meal_slot in MEAL_SLOTS:
         selections[meal_slot] = {}
 
         with st.expander(meal_slot, expanded=True):
+            meal_checked_components = []
+
             cols = st.columns(4)
 
             for idx, component_slot in enumerate(COMPONENT_SLOTS):
+                selections[meal_slot][component_slot] = []
+
                 with cols[idx]:
-                    default_name = saved_day.get(
-                        (meal_slot, component_slot),
-                        DEFAULT_DAY_PLAN[meal_slot][component_slot]
-                    )
+                    st.markdown(f"**{component_slot}**")
 
-                    options = component_names(component_slot)
-                    default_index = options.index(default_name) if default_name in options else 0
+                    for component in COMPONENTS[component_slot]:
+                        if component["name"] == "None":
+                            continue
 
-                    chosen_name = st.selectbox(
-                        component_slot,
-                        options,
-                        index=default_index,
-                        key=f"{selected_date}_{meal_slot}_{component_slot}"
-                    )
-
-                    component = get_component(component_slot, chosen_name)
-                    selections[meal_slot][component_slot] = component
-
-                    if component["name"] != "None":
-                        st.caption(
-                            f"{component['calories']} cal | "
-                            f"{component['protein']}g protein | "
-                            f"${component['cost']:.2f}"
+                        default_checked = get_checkbox_default(
+                            saved_day=saved_day,
+                            meal_slot=meal_slot,
+                            component_slot=component_slot,
+                            component_name=component["name"]
                         )
 
-            meal_totals = calculate_totals(list(selections[meal_slot].values()))
+                        checked = st.checkbox(
+                            component["name"],
+                            value=default_checked,
+                            key=f"{selected_date}_{meal_slot}_{component_slot}_{component['name']}"
+                        )
+
+                        if checked:
+                            selections[meal_slot][component_slot].append(component)
+                            meal_checked_components.append(component)
+                            st.caption(
+                                f"{component['calories']} cal | "
+                                f"{component['protein']}g protein | "
+                                f"${component['cost']:.2f}"
+                            )
+
+            meal_totals = calculate_totals(meal_checked_components)
+
             st.markdown(
                 f"**{meal_slot} Total:** "
                 f"{meal_totals['calories']} cal | "
@@ -708,7 +740,8 @@ with tab2:
 
     all_components = []
     for meal_slot in MEAL_SLOTS:
-        all_components.extend(list(selections[meal_slot].values()))
+        for component_slot in COMPONENT_SLOTS:
+            all_components.extend(selections[meal_slot][component_slot])
 
     daily_totals = calculate_totals(all_components)
 
@@ -723,12 +756,15 @@ with tab2:
 
     rows = rows_from_selections(selected_date, selections)
 
-    if st.button("💾 Save This Day to Google Sheets", use_container_width=True):
-        ok, msg = save_day_to_sheets(selected_date, rows)
-        if ok:
-            st.success(msg)
+    if st.button("💾 Save Checked Items to Google Sheets", use_container_width=True):
+        if not rows:
+            st.warning("No items are checked, so nothing was saved.")
         else:
-            st.warning(msg)
+            ok, msg = save_day_to_sheets(selected_date, rows)
+            if ok:
+                st.success(msg)
+            else:
+                st.warning(msg)
 
 
 # =========================================================
@@ -739,14 +775,24 @@ with tab3:
 
     summary_rows = []
     for meal_slot in MEAL_SLOTS:
-        components = selections[meal_slot]
-        totals = calculate_totals(list(components.values()))
+        component_groups = selections[meal_slot]
+
+        selected_names = {}
+        all_meal_components = []
+
+        for component_slot in COMPONENT_SLOTS:
+            component_list = component_groups[component_slot]
+            all_meal_components.extend(component_list)
+            selected_names[component_slot] = ", ".join([c["name"] for c in component_list]) if component_list else "None"
+
+        totals = calculate_totals(all_meal_components)
+
         summary_rows.append({
             "Meal": meal_slot,
-            "Drink": components["Drink"]["name"],
-            "Main": components["Main"]["name"],
-            "Side": components["Side"]["name"],
-            "Dessert/Treat": components["Dessert/Treat"]["name"],
+            "Drink": selected_names["Drink"],
+            "Main": selected_names["Main"],
+            "Side": selected_names["Side"],
+            "Dessert/Treat": selected_names["Dessert/Treat"],
             "Calories": totals["calories"],
             "Protein": totals["protein"],
             "Carbs": totals["carbs"],
