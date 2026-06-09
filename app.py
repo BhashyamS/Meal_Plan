@@ -403,6 +403,43 @@ def read_logs():
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     return df
 
+def clean_for_google_sheets(df):
+    """
+    Google Sheets API does not like NaN/None/numpy values.
+    This converts the dataframe into clean JSON-safe rows.
+    """
+    if df.empty:
+        return []
+
+    df = df.copy()
+
+    # Ensure all expected columns exist
+    headers = daily_log_headers()
+    for col in headers:
+        if col not in df.columns:
+            df[col] = ""
+
+    df = df[headers]
+
+    # Replace pandas/numpy missing values with empty strings
+    df = df.fillna("")
+
+    # Convert each value into a JSON-safe Python value
+    clean_rows = []
+    for _, row in df.iterrows():
+        clean_row = []
+        for value in row.tolist():
+            if pd.isna(value):
+                clean_row.append("")
+            elif isinstance(value, (int, float, str, bool)):
+                clean_row.append(value)
+            else:
+                clean_row.append(str(value))
+        clean_rows.append(clean_row)
+
+    return clean_rows
+
+
 def save_day_to_sheets(plan_date, rows):
     spreadsheet = get_spreadsheet()
     if spreadsheet is None:
@@ -416,18 +453,26 @@ def save_day_to_sheets(plan_date, rows):
 
     date_str = str(plan_date)
 
+    # Remove previously saved rows for this same date, then replace them
     if not existing_df.empty and "plan_date" in existing_df.columns:
         existing_df = existing_df[existing_df["plan_date"].astype(str) != date_str]
 
     new_df = pd.DataFrame(rows)
-    combined = pd.concat([existing_df, new_df], ignore_index=True) if not existing_df.empty else new_df
+
+    if existing_df.empty:
+        combined = new_df
+    elif new_df.empty:
+        combined = existing_df
+    else:
+        combined = pd.concat([existing_df, new_df], ignore_index=True)
 
     worksheet.clear()
     worksheet.append_row(headers)
 
-    if not combined.empty:
-        combined = combined[headers]
-        worksheet.append_rows(combined.values.tolist())
+    clean_rows = clean_for_google_sheets(combined)
+
+    if clean_rows:
+        worksheet.append_rows(clean_rows, value_input_option="USER_ENTERED")
 
     return True, f"Saved meals for {date_str}."
 
