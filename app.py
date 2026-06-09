@@ -257,15 +257,35 @@ def get_spreadsheet():
         return client.create(name)
 
 def get_or_create_worksheet(spreadsheet, title, headers):
+    """
+    Safely gets or creates a worksheet.
+    Uses a small starting size to avoid Google Sheets API/cell limit issues.
+    """
     try:
         worksheet = spreadsheet.worksheet(title)
     except Exception:
-        worksheet = spreadsheet.add_worksheet(title=title, rows=3000, cols=max(20, len(headers)))
-        worksheet.append_row(headers)
-        return worksheet
+        try:
+            worksheet = spreadsheet.add_worksheet(
+                title=title,
+                rows=100,
+                cols=max(12, len(headers))
+            )
+            worksheet.append_row(headers)
+            return worksheet
+        except Exception as e:
+            st.error(f"Could not create the Google Sheet tab: {title}")
+            st.caption(str(e))
+            return None
 
-    if len(worksheet.get_all_values()) == 0:
-        worksheet.append_row(headers)
+    # Try to make sure the header row exists without crashing the app
+    try:
+        first_row = worksheet.row_values(1)
+        if not first_row:
+            worksheet.append_row(headers)
+    except Exception as e:
+        st.warning(f"Could not verify headers for tab: {title}")
+        st.caption(str(e))
+
     return worksheet
 
 def clean_df_for_sheets(df, headers):
@@ -293,32 +313,61 @@ def rewrite_sheet(title, headers, df):
     spreadsheet = get_spreadsheet()
     if spreadsheet is None:
         return False, "Google Sheets is not connected."
+
     worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    worksheet.clear()
-    worksheet.append_row(headers)
-    rows = clean_df_for_sheets(df, headers)
-    if rows:
-        worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-    return True, f"{title} updated."
+    if worksheet is None:
+        return False, f"Could not access tab: {title}"
+
+    try:
+        worksheet.clear()
+        worksheet.append_row(headers)
+        rows = clean_df_for_sheets(df, headers)
+        if rows:
+            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
+        return True, f"{title} updated."
+    except Exception as e:
+        st.error(f"Could not write to tab: {title}")
+        st.caption(str(e))
+        return False, str(e)
 
 def append_sheet(title, headers, df):
     spreadsheet = get_spreadsheet()
     if spreadsheet is None:
         return False, "Google Sheets is not connected."
+
     worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    rows = clean_df_for_sheets(df, headers)
-    if rows:
-        worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-    return True, f"{title} saved."
+    if worksheet is None:
+        return False, f"Could not access tab: {title}"
+
+    try:
+        rows = clean_df_for_sheets(df, headers)
+        if rows:
+            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
+        return True, f"{title} saved."
+    except Exception as e:
+        st.error(f"Could not append to tab: {title}")
+        st.caption(str(e))
+        return False, str(e)
 
 def read_sheet(title, headers):
     spreadsheet = get_spreadsheet()
     if spreadsheet is None:
         return pd.DataFrame(columns=headers)
+
     worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    records = worksheet.get_all_records()
+    if worksheet is None:
+        return pd.DataFrame(columns=headers)
+
+    try:
+        records = worksheet.get_all_records()
+    except Exception as e:
+        st.warning(f"Could not read tab: {title}")
+        st.caption(str(e))
+        return pd.DataFrame(columns=headers)
+
     if not records:
         return pd.DataFrame(columns=headers)
+
     df = pd.DataFrame(records)
     for col in headers:
         if col not in df.columns:
@@ -367,6 +416,31 @@ def read_budget_logs():
     df = read_sheet("Budget_Log", budget_headers())
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
     return df
+
+def setup_required_tabs():
+    """
+    Optional setup button helper. Creates all required tabs cleanly.
+    """
+    if not google_sheets_is_configured():
+        return False, "Google Sheets is not connected."
+
+    spreadsheet = get_spreadsheet()
+    if spreadsheet is None:
+        return False, "Could not open spreadsheet."
+
+    required = [
+        ("Daily_Logs", daily_headers()),
+        ("Shopping_Trips", shopping_headers()),
+        ("Inventory", inventory_headers()),
+        ("Budget_Log", budget_headers()),
+    ]
+
+    for title, headers in required:
+        ws = get_or_create_worksheet(spreadsheet, title, headers)
+        if ws is None:
+            return False, f"Could not create/access {title}"
+
+    return True, "Required Google Sheets tabs are ready."
 
 def save_budget_entry(entry_date, entry_type, description, amount):
     df = pd.DataFrame([{
@@ -584,6 +658,15 @@ st.markdown("---")
 
 if not google_sheets_is_configured():
     st.warning("Google Sheets is not connected yet. The app layout works, but saving/inventory/history need Google Sheets.")
+else:
+    with st.expander("Google Sheets Setup / Repair", expanded=False):
+        st.caption("Use this if the app errors while creating tabs like Inventory or Shopping_Trips.")
+        if st.button("Create / Repair Required Google Sheet Tabs"):
+            ok, msg = setup_required_tabs()
+            if ok:
+                st.success(msg)
+            else:
+                st.error(msg)
 
 
 # =========================================================
