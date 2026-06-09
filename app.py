@@ -26,19 +26,40 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
-    .main-title {
-        font-size: 38px;
-        font-weight: 900;
-        color: #F4C542;
-        margin-bottom: 0px;
-        line-height: 1.1;
+    .hero-wrap {
+        text-align: center;
+        background: radial-gradient(circle at top, #5C3B1E 0%, #23160B 45%, #0E1117 100%);
+        border: 1px solid #F4C542;
+        border-radius: 28px;
+        padding: 28px 18px;
+        margin-bottom: 22px;
+        box-shadow: 0 0 25px rgba(244, 197, 66, 0.18);
     }
 
-    .subtitle {
-        font-size: 16px;
-        color: #E8D8B8;
-        margin-top: 6px;
-        margin-bottom: 18px;
+    .hero-title {
+        font-size: 44px;
+        font-weight: 950;
+        color: #FFD95A;
+        margin-bottom: 6px;
+        line-height: 1.05;
+        text-shadow: 0 3px 0 #5C3B1E;
+    }
+
+    .hero-subtitle {
+        font-size: 17px;
+        color: #FFF2C7;
+        margin-bottom: 0px;
+    }
+
+    .honey-pill {
+        display: inline-block;
+        background: #FFD95A;
+        color: #3B2A1A;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        font-size: 14px;
     }
 
     .section-card {
@@ -75,12 +96,17 @@ st.markdown("""
         margin-top: 10px;
     }
 
-    .warning-card {
-        background: #3a2411;
-        border: 1px solid #cc8a22;
+    .kpi-card {
+        background: #11151c;
+        border: 1px solid #30343d;
+        border-radius: 16px;
         padding: 14px;
-        border-radius: 14px;
-        margin-bottom: 12px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .kpi-card b {
+        color: #FFD95A;
     }
 
     div[data-testid="stMetric"] {
@@ -90,11 +116,35 @@ st.markdown("""
         border-radius: 14px;
     }
 
+    div.stButton > button {
+        width: 100%;
+        border-radius: 999px;
+        border: 1px solid #F4C542;
+        background: #17120A;
+        color: #FFD95A;
+        font-weight: 800;
+        padding: 0.7rem 1rem;
+    }
+
+    div.stButton > button:hover {
+        border-color: #FFF2C7;
+        background: #2B1A0B;
+        color: #FFF2C7;
+    }
+
+    .footer-honey {
+        text-align: center;
+        color: #FFD95A;
+        font-weight: 800;
+        padding: 18px;
+        margin-top: 28px;
+    }
+
     @media (max-width: 768px) {
-        .main-title {
+        .hero-title {
             font-size: 30px;
         }
-        .subtitle {
+        .hero-subtitle {
             font-size: 14px;
         }
         div[data-testid="column"] {
@@ -559,13 +609,24 @@ def save_day(plan_date, selections, deduct=True):
 # APP HELPERS
 # =========================================================
 def component_names(slot):
-    return [x["name"] for x in COMPONENTS[slot]]
+    return [x["name"] for x in COMPONENTS[slot]] + ["Other / Custom"]
 
 def get_component(slot, name):
     for x in COMPONENTS[slot]:
         if x["name"] == name:
             return x
     return COMPONENTS[slot][0]
+
+def make_custom_component(name, calories, protein, carbs, fat, cost):
+    return {
+        "name": name if name else "Custom item",
+        "calories": float(calories),
+        "protein": float(protein),
+        "carbs": float(carbs),
+        "fat": float(fat),
+        "cost": float(cost),
+        "ingredients": {name if name else "Custom item": 1}
+    }
 
 def totals_from_components(components):
     totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
@@ -644,39 +705,43 @@ def make_shopping_base_list():
 # =========================================================
 # HEADER + TOP NAV
 # =========================================================
-st.markdown('<p class="main-title">🐻 Pooh Bear Yum Yum Tracker</p>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Mobile-friendly client meal, grocery, inventory, and budget tracker.</p>', unsafe_allow_html=True)
+st.markdown("""
+<div class="hero-wrap">
+    <div class="honey-pill">🍯 Client Fuel Portal</div>
+    <div class="hero-title">🐻 Pooh Bear Yum Yum Tracker 🐝</div>
+    <div class="hero-subtitle">Honey-powered meals, groceries, inventory, and budget tracking.</div>
+</div>
+""", unsafe_allow_html=True)
 
-page = st.radio(
-    "Navigation",
-    ["🏠 Overview", "🍽️ Meal Builder", "🛒 Grocery + Shopping", "📊 History + Budget"],
-    horizontal=True,
-    label_visibility="collapsed"
-)
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 Overview"
+
+nav_cols = st.columns(4)
+with nav_cols[0]:
+    if st.button("🏠 Overview"):
+        st.session_state.page = "🏠 Overview"
+with nav_cols[1]:
+    if st.button("🍽️ Meal Builder"):
+        st.session_state.page = "🍽️ Meal Builder"
+with nav_cols[2]:
+    if st.button("🛒 Grocery + Shopping"):
+        st.session_state.page = "🛒 Grocery + Shopping"
+with nav_cols[3]:
+    if st.button("📊 History + Budget"):
+        st.session_state.page = "📊 History + Budget"
+
+page = st.session_state.page
 
 st.markdown("---")
 
 if not google_sheets_is_configured():
     st.warning("Google Sheets is not connected yet. The app layout works, but saving/inventory/history need Google Sheets.")
-else:
-    with st.expander("Google Sheets Setup / Repair", expanded=False):
-        st.caption("Use this if the app errors while creating tabs like Inventory or Shopping_Trips.")
-        if st.button("Create / Repair Required Google Sheet Tabs"):
-            ok, msg = setup_required_tabs()
-            if ok:
-                st.success(msg)
-            else:
-                st.error(msg)
-
 
 # =========================================================
 # PAGE 1: OVERVIEW
 # =========================================================
 if page == "🏠 Overview":
     st.subheader("Overview")
-
-    selected_date = st.date_input("Client control: select day/date", value=date.today(), key="overview_date")
-    weekly_budget = st.number_input("Client control: weekly budget", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5)
 
     c1, c2 = st.columns(2)
     with c1:
@@ -687,8 +752,7 @@ if page == "🏠 Overview":
             <b>Goal:</b> {CLIENT['goal']}<br>
             <b>Age:</b> {CLIENT['age']}<br>
             <b>Height:</b> {CLIENT['height']}<br>
-            <b>Weight:</b> {CLIENT['weight']}<br>
-            <b>Prepared By:</b> {CLIENT['prepared_by']}
+            <b>Weight:</b> {CLIENT['weight']}
         </div>
         """, unsafe_allow_html=True)
 
@@ -698,7 +762,7 @@ if page == "🏠 Overview":
             <h3>🎯 Plan Targets</h3>
             <b>Calories:</b> {CLIENT['calorie_target']}<br>
             <b>Protein:</b> {CLIENT['protein_target']}<br>
-            <b>Budget:</b> ${weekly_budget}/week<br>
+            <b>Budget:</b> ${CLIENT['weekly_budget']}/week<br>
             <b>Lifestyle:</b> {CLIENT['lifestyle']}
         </div>
         """, unsafe_allow_html=True)
@@ -713,7 +777,8 @@ if page == "🏠 Overview":
     total_meal_estimate = float(meals["cost"].sum()) if not meals.empty else 0
     total_extra_budget = float(budget_logs["amount"].sum()) if not budget_logs.empty else 0
 
-    week = week_start(selected_date)
+    today = date.today()
+    week = week_start(today)
     week_end = week + timedelta(days=6)
 
     spend_df = spending_summary()
@@ -727,7 +792,7 @@ if page == "🏠 Overview":
     m1.metric("Shopping Spend", f"${total_shopping:.2f}")
     m2.metric("Meal Cost So Far", f"${total_meal_estimate:.2f}")
     m3.metric("Logged Budget Total", f"${total_extra_budget:.2f}")
-    m4.metric("This Week Spend", f"${week_spend:.2f}", delta=f"${weekly_budget - week_spend:.2f} left")
+    m4.metric("This Week Spend", f"${week_spend:.2f}", delta=f"${CLIENT['weekly_budget'] - week_spend:.2f} left")
 
     st.subheader("Low Stock Notifications")
     alerts = low_stock_alerts()
@@ -742,7 +807,7 @@ if page == "🏠 Overview":
         st.info("No spending history yet. Use Shopping Mode or save meal days first.")
     else:
         daily = spend_df.groupby("date", as_index=False)["amount"].sum()
-        daily["daily_budget"] = weekly_budget / 7
+        daily["daily_budget"] = CLIENT["weekly_budget"] / 7
         daily["difference"] = daily["daily_budget"] - daily["amount"]
         st.dataframe(daily, use_container_width=True, hide_index=True)
         st.line_chart(daily.set_index("date")[["amount", "daily_budget"]])
@@ -789,11 +854,32 @@ elif page == "🍽️ Meal Builder":
                         index=default_index,
                         key=f"{selected_date}_{meal_slot}_{component_slot}"
                     )
-                    comp = get_component(component_slot, chosen)
+
+                    if chosen == "Other / Custom":
+                        st.caption("Enter custom nutrition values")
+                        custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
+                        custom_cal = st.number_input("Calories", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
+                        custom_pro = st.number_input("Protein (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
+                        custom_carbs = st.number_input("Carbs (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
+                        custom_fat = st.number_input("Fat (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
+                        custom_cost = st.number_input("Cost ($)", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
+                        comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
+                    else:
+                        comp = get_component(component_slot, chosen)
+
                     selections[meal_slot]["components"][component_slot] = comp
 
-                    if comp["name"] != "None":
-                        st.caption(f"{comp['calories']} cal | {comp['protein']}g protein | ${comp['cost']:.2f}")
+                    st.markdown(
+                        f"""
+                        <div class="kpi-card">
+                            <b>{component_slot} KPI</b><br>
+                            {comp['calories']:.0f} cal<br>
+                            {comp['protein']:.0f}g protein<br>
+                            ${comp['cost']:.2f}
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
             if include_meal:
                 totals = totals_from_components(list(selections[meal_slot]["components"].values()))
@@ -839,6 +925,8 @@ elif page == "🍽️ Meal Builder":
 # =========================================================
 elif page == "🛒 Grocery + Shopping":
     st.subheader("General Grocery Lists")
+    weekly_budget = st.number_input("Weekly budget", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5, key="grocery_budget")
+    st.metric("Daily Budget Target", f"${weekly_budget / 7:.2f}")
 
     st.markdown("### Monthly Buy")
     monthly_df = pd.DataFrame(GENERAL_MONTHLY)
@@ -970,6 +1058,17 @@ elif page == "🛒 Grocery + Shopping":
 elif page == "📊 History + Budget":
     st.subheader("Previous Days + Budget Tracking")
 
+    if google_sheets_is_configured():
+        with st.expander("Google Sheets Setup / Repair", expanded=False):
+            st.caption("Use this only if Google Sheets tabs are missing or broken.")
+            if st.button("Create / Repair Required Google Sheet Tabs"):
+                ok, msg = setup_required_tabs()
+                if ok:
+                    st.success(msg)
+                else:
+                    st.error(msg)
+
+
     logs = read_daily_logs()
 
     if logs.empty:
@@ -1026,4 +1125,4 @@ elif page == "📊 History + Budget":
 
 
 st.markdown("---")
-st.caption("Pooh Bear Yum Yum Tracker • 4-page mobile-friendly client app • Streamlit + Google Sheets")
+st.markdown("<div class='footer-honey'>🍯 Made by Honey</div>", unsafe_allow_html=True)
