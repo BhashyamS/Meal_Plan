@@ -111,6 +111,7 @@ st.markdown("""
 # =========================================================
 CLIENT = {
     "name": "Pooh Bear",
+    "prepared_by": "Srija Bhashyam",
     "goal": "Lean Bulk",
     "age": 27,
     "height": "6'0",
