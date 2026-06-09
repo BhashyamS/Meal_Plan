@@ -22,7 +22,7 @@ st.set_page_config(
 )
 
 # =========================================================
-# Styling
+# CSS
 # =========================================================
 st.markdown("""
 <style>
@@ -102,233 +102,221 @@ CLIENT = {
 
 
 # =========================================================
-# Meal Option Data
+# Component Options
 # =========================================================
-MEAL_OPTIONS = {
-    "Breakfast": [
+# Units are estimated:
+# - Whey protein: scoops
+# - Milk: oz
+# - Peanut butter: tbsp
+# - Trail mix/granola: servings
+# - Most restaurant/packaged items: item count
+
+COMPONENTS = {
+    "Drink": [
         {
-            "name": "Protein iced coffee + PB bagel + banana + 2 boiled eggs",
-            "calories": 1000,
-            "protein": 75,
-            "carbs": 95,
-            "fat": 38,
-            "cost": 4.50,
-            "tags": "home, mini-fridge, lower sugar",
-            "ingredients": {
-                "Whey protein": 2,
-                "Whole milk": 16,
-                "Bagel": 1,
-                "Peanut butter": 2,
-                "Banana": 1,
-                "Boiled eggs": 2
-            }
+            "name": "None",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
+            "tags": "",
+            "ingredients": {}
         },
         {
-            "name": "Protein iced coffee + PB bagel + banana",
-            "calories": 850,
-            "protein": 63,
-            "carbs": 90,
-            "fat": 30,
-            "cost": 3.40,
-            "tags": "home, fastest option",
-            "ingredients": {
-                "Whey protein": 2,
-                "Whole milk": 16,
-                "Bagel": 1,
-                "Peanut butter": 2,
-                "Banana": 1
-            }
+            "name": "Protein iced coffee",
+            "calories": 380, "protein": 54, "carbs": 24, "fat": 10, "cost": 2.00,
+            "tags": "home, high protein",
+            "ingredients": {"Whey protein": 2, "Whole milk": 16, "Cold coffee": 1}
         },
         {
-            "name": "Greek yogurt + granola + banana + protein coffee",
-            "calories": 900,
-            "protein": 72,
-            "carbs": 105,
-            "fat": 22,
-            "cost": 4.80,
-            "tags": "balanced, easy",
-            "ingredients": {
-                "Whey protein": 2,
-                "Whole milk": 16,
-                "Greek yogurt": 1,
-                "Granola": 1,
-                "Banana": 1
-            }
+            "name": "Regular cold coffee",
+            "calories": 40, "protein": 1, "carbs": 8, "fat": 1, "cost": 0.50,
+            "tags": "low calorie",
+            "ingredients": {"Cold coffee": 1}
+        },
+        {
+            "name": "Whole milk",
+            "calories": 150, "protein": 8, "carbs": 12, "fat": 8, "cost": 0.75,
+            "tags": "mini-fridge",
+            "ingredients": {"Whole milk": 8}
+        },
+        {
+            "name": "Water",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
+            "tags": "hydration",
+            "ingredients": {"Water": 1}
         }
     ],
-    "Lunch": [
+    "Main": [
+        {
+            "name": "None",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
+            "tags": "",
+            "ingredients": {}
+        },
+        {
+            "name": "Peanut butter bagel",
+            "calories": 470, "protein": 18, "carbs": 58, "fat": 19, "cost": 1.25,
+            "tags": "budget, shelf-stable",
+            "ingredients": {"Bagel": 1, "Peanut butter": 2}
+        },
+        {
+            "name": "Greek yogurt + granola bowl",
+            "calories": 350, "protein": 20, "carbs": 45, "fat": 8, "cost": 2.00,
+            "tags": "mini-fridge",
+            "ingredients": {"Greek yogurt": 1, "Granola": 1}
+        },
         {
             "name": "Subway Footlong Turkey",
-            "calories": 850,
-            "protein": 60,
-            "carbs": 95,
-            "fat": 22,
-            "cost": 12.00,
+            "calories": 850, "protein": 60, "carbs": 95, "fat": 22, "cost": 12.00,
             "tags": "handheld, driving-friendly",
-            "ingredients": {
-                "Subway Footlong Turkey": 1
-            }
+            "ingredients": {"Subway Footlong Turkey": 1}
         },
         {
             "name": "Subway Footlong Rotisserie Chicken",
-            "calories": 900,
-            "protein": 65,
-            "carbs": 95,
-            "fat": 25,
-            "cost": 13.00,
+            "calories": 900, "protein": 65, "carbs": 95, "fat": 25, "cost": 13.00,
             "tags": "handheld, driving-friendly",
-            "ingredients": {
-                "Subway Footlong Rotisserie Chicken": 1
-            }
+            "ingredients": {"Subway Footlong Rotisserie Chicken": 1}
         },
         {
-            "name": "Grocery store deli sandwich + protein bar",
-            "calories": 900,
-            "protein": 55,
-            "carbs": 95,
-            "fat": 30,
-            "cost": 8.25,
+            "name": "Grocery store deli sandwich",
+            "calories": 700, "protein": 35, "carbs": 75, "fat": 25, "cost": 7.00,
             "tags": "budget, handheld",
-            "ingredients": {
-                "Grocery store deli sandwich": 1,
-                "Protein bar": 1
-            }
+            "ingredients": {"Grocery store deli sandwich": 1}
         },
         {
-            "name": "Vitality Bowl protein wrap + protein bar",
-            "calories": 900,
-            "protein": 50,
-            "carbs": 95,
-            "fat": 28,
-            "cost": 16.25,
+            "name": "Vitality Bowl protein wrap",
+            "calories": 700, "protein": 30, "carbs": 75, "fat": 24, "cost": 15.00,
             "tags": "client favorite, handheld",
-            "ingredients": {
-                "Vitality Bowl protein wrap": 1,
-                "Protein bar": 1
-            }
+            "ingredients": {"Vitality Bowl protein wrap": 1}
         },
         {
             "name": "Jersey Mike's Giant Turkey Sub",
-            "calories": 1100,
-            "protein": 70,
-            "carbs": 120,
-            "fat": 38,
-            "cost": 15.00,
+            "calories": 1100, "protein": 70, "carbs": 120, "fat": 38, "cost": 15.00,
             "tags": "higher calorie, handheld",
-            "ingredients": {
-                "Jersey Mike's Giant Turkey Sub": 1
-            }
-        }
-    ],
-    "Snack": [
-        {
-            "name": "Greek yogurt + granola",
-            "calories": 350,
-            "protein": 20,
-            "carbs": 45,
-            "fat": 8,
-            "cost": 2.00,
-            "tags": "mini-fridge, lower sodium",
-            "ingredients": {
-                "Greek yogurt": 1,
-                "Granola": 1
-            }
+            "ingredients": {"Jersey Mike's Giant Turkey Sub": 1}
         },
         {
-            "name": "Trail mix + banana",
-            "calories": 500,
-            "protein": 10,
-            "carbs": 65,
-            "fat": 25,
-            "cost": 1.50,
-            "tags": "car snack, shelf-stable",
-            "ingredients": {
-                "Trail mix": 1,
-                "Banana": 1
-            }
+            "name": "Rotisserie chicken portion",
+            "calories": 550, "protein": 65, "carbs": 0, "fat": 30, "cost": 2.50,
+            "tags": "home dinner, high protein",
+            "ingredients": {"Rotisserie chicken portion": 1}
+        }
+    ],
+    "Side": [
+        {
+            "name": "None",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
+            "tags": "",
+            "ingredients": {}
+        },
+        {
+            "name": "Banana",
+            "calories": 120, "protein": 1, "carbs": 31, "fat": 0, "cost": 0.35,
+            "tags": "fruit, portable",
+            "ingredients": {"Banana": 1}
+        },
+        {
+            "name": "2 boiled eggs",
+            "calories": 140, "protein": 12, "carbs": 1, "fat": 10, "cost": 1.10,
+            "tags": "mini-fridge, low sugar",
+            "ingredients": {"Boiled eggs": 2}
         },
         {
             "name": "Protein bar",
-            "calories": 200,
-            "protein": 20,
-            "carbs": 22,
-            "fat": 6,
-            "cost": 1.25,
+            "calories": 200, "protein": 20, "carbs": 22, "fat": 6, "cost": 1.25,
             "tags": "backup snack",
-            "ingredients": {
-                "Protein bar": 1
-            }
+            "ingredients": {"Protein bar": 1}
         },
         {
-            "name": "Boiled eggs + banana",
-            "calories": 300,
-            "protein": 16,
-            "carbs": 30,
-            "fat": 11,
-            "cost": 2.00,
-            "tags": "lower sugar, mini-fridge",
-            "ingredients": {
-                "Boiled eggs": 2,
-                "Banana": 1
-            }
+            "name": "Trail mix",
+            "calories": 380, "protein": 9, "carbs": 35, "fat": 24, "cost": 1.15,
+            "tags": "car snack, shelf-stable",
+            "ingredients": {"Trail mix": 1}
+        },
+        {
+            "name": "Rice cup",
+            "calories": 220, "protein": 4, "carbs": 46, "fat": 2, "cost": 1.25,
+            "tags": "easy carb, lower sugar",
+            "ingredients": {"Rice cup": 1}
+        },
+        {
+            "name": "Whole wheat bagel",
+            "calories": 250, "protein": 10, "carbs": 48, "fat": 2, "cost": 0.75,
+            "tags": "easy carb",
+            "ingredients": {"Whole wheat bagel": 1}
+        },
+        {
+            "name": "Whole wheat bread serving",
+            "calories": 240, "protein": 8, "carbs": 44, "fat": 4, "cost": 0.75,
+            "tags": "easy carb",
+            "ingredients": {"Whole wheat bread serving": 1}
         }
     ],
-    "Dinner": [
+    "Dessert/Treat": [
         {
-            "name": "Rotisserie chicken + whole wheat bagel",
-            "calories": 900,
-            "protein": 75,
-            "carbs": 70,
-            "fat": 30,
-            "cost": 4.00,
-            "tags": "home, budget, high protein",
-            "ingredients": {
-                "Rotisserie chicken portion": 1,
-                "Whole wheat bagel": 1
-            }
+            "name": "None",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
+            "tags": "lower sugar option",
+            "ingredients": {}
         },
         {
-            "name": "Rotisserie chicken + rice cup",
-            "calories": 750,
-            "protein": 70,
-            "carbs": 55,
-            "fat": 25,
-            "cost": 4.00,
-            "tags": "home, lower sodium carb option",
-            "ingredients": {
-                "Rotisserie chicken portion": 1,
-                "Rice cup": 1
-            }
+            "name": "Greek yogurt",
+            "calories": 150, "protein": 18, "carbs": 12, "fat": 3, "cost": 1.25,
+            "tags": "higher protein dessert",
+            "ingredients": {"Greek yogurt": 1}
         },
         {
-            "name": "Rotisserie chicken + whole wheat bread",
-            "calories": 850,
-            "protein": 72,
-            "carbs": 70,
-            "fat": 28,
-            "cost": 4.00,
-            "tags": "home, simple",
-            "ingredients": {
-                "Rotisserie chicken portion": 1,
-                "Whole wheat bread serving": 1
-            }
+            "name": "Granola serving",
+            "calories": 200, "protein": 4, "carbs": 35, "fat": 5, "cost": 0.75,
+            "tags": "sweet, moderate sugar",
+            "ingredients": {"Granola": 1}
         },
         {
-            "name": "Grocery store wrap + boiled eggs",
-            "calories": 850,
-            "protein": 55,
-            "carbs": 85,
-            "fat": 30,
-            "cost": 9.00,
-            "tags": "backup dinner",
-            "ingredients": {
-                "Grocery store wrap": 1,
-                "Boiled eggs": 2
-            }
+            "name": "Protein bar",
+            "calories": 200, "protein": 20, "carbs": 22, "fat": 6, "cost": 1.25,
+            "tags": "sweet, high protein",
+            "ingredients": {"Protein bar": 1}
+        },
+        {
+            "name": "Banana",
+            "calories": 120, "protein": 1, "carbs": 31, "fat": 0, "cost": 0.35,
+            "tags": "fruit",
+            "ingredients": {"Banana": 1}
         }
     ]
 }
 
+MEAL_SLOTS = ["Breakfast", "Lunch", "Snack", "Dinner"]
+COMPONENT_SLOTS = ["Drink", "Main", "Side", "Dessert/Treat"]
+
+
+# =========================================================
+# Default Example Plan
+# =========================================================
+DEFAULT_DAY_PLAN = {
+    "Breakfast": {
+        "Drink": "Protein iced coffee",
+        "Main": "Peanut butter bagel",
+        "Side": "2 boiled eggs",
+        "Dessert/Treat": "Banana"
+    },
+    "Lunch": {
+        "Drink": "Water",
+        "Main": "Subway Footlong Turkey",
+        "Side": "Protein bar",
+        "Dessert/Treat": "None"
+    },
+    "Snack": {
+        "Drink": "Water",
+        "Main": "Greek yogurt + granola bowl",
+        "Side": "Trail mix",
+        "Dessert/Treat": "None"
+    },
+    "Dinner": {
+        "Drink": "Water",
+        "Main": "Rotisserie chicken portion",
+        "Side": "Whole wheat bagel",
+        "Dessert/Treat": "Greek yogurt"
+    }
+}
 
 MONTHLY_ITEMS = [
     {"Item": "Whey protein", "Quantity": "1 large Costco tub", "Storage": "Room temp", "Estimated Cost": 60},
@@ -350,7 +338,7 @@ WEEKLY_REFILL_ITEMS = [
 
 
 # =========================================================
-# Google Sheets Helpers
+# Google Sheets
 # =========================================================
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -373,7 +361,6 @@ def get_spreadsheet():
     creds_dict = dict(st.secrets["gcp_service_account"])
     credentials = Credentials.from_service_account_info(creds_dict, scopes=SCOPE)
     client = gspread.authorize(credentials)
-
     spreadsheet_name = st.secrets["spreadsheet_name"]
 
     try:
@@ -385,160 +372,150 @@ def get_or_create_worksheet(spreadsheet, title, headers):
     try:
         worksheet = spreadsheet.worksheet(title)
     except Exception:
-        worksheet = spreadsheet.add_worksheet(title=title, rows=1000, cols=max(20, len(headers)))
+        worksheet = spreadsheet.add_worksheet(title=title, rows=2000, cols=max(20, len(headers)))
         worksheet.append_row(headers)
         return worksheet
 
-    existing_values = worksheet.get_all_values()
-    if len(existing_values) == 0:
+    values = worksheet.get_all_values()
+    if len(values) == 0:
         worksheet.append_row(headers)
     return worksheet
 
-def read_saved_logs():
-    spreadsheet = get_spreadsheet()
-    if spreadsheet is None:
-        return pd.DataFrame()
-
-    headers = [
-        "saved_at", "week_start", "day", "meal_slot", "meal_name",
+def daily_log_headers():
+    return [
+        "saved_at", "plan_date", "meal_slot", "component_slot", "component_name",
         "calories", "protein", "carbs", "fat", "cost", "ingredients_json"
     ]
-    worksheet = get_or_create_worksheet(spreadsheet, "Daily_Logs", headers)
+
+def read_logs():
+    spreadsheet = get_spreadsheet()
+    if spreadsheet is None:
+        return pd.DataFrame(columns=daily_log_headers())
+
+    worksheet = get_or_create_worksheet(spreadsheet, "Daily_Logs", daily_log_headers())
     records = worksheet.get_all_records()
 
     if not records:
-        return pd.DataFrame(columns=headers)
+        return pd.DataFrame(columns=daily_log_headers())
 
     df = pd.DataFrame(records)
     for col in ["calories", "protein", "carbs", "fat", "cost"]:
         df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
     return df
 
-def save_week_to_sheets(week_start, selected_rows):
+def save_day_to_sheets(plan_date, rows):
     spreadsheet = get_spreadsheet()
     if spreadsheet is None:
         return False, "Google Sheets is not connected yet."
 
-    headers = [
-        "saved_at", "week_start", "day", "meal_slot", "meal_name",
-        "calories", "protein", "carbs", "fat", "cost", "ingredients_json"
-    ]
+    headers = daily_log_headers()
     worksheet = get_or_create_worksheet(spreadsheet, "Daily_Logs", headers)
 
     existing = worksheet.get_all_records()
     existing_df = pd.DataFrame(existing)
 
-    week_start_str = str(week_start)
+    date_str = str(plan_date)
 
-    if not existing_df.empty and "week_start" in existing_df.columns:
-        existing_df = existing_df[existing_df["week_start"].astype(str) != week_start_str]
+    if not existing_df.empty and "plan_date" in existing_df.columns:
+        existing_df = existing_df[existing_df["plan_date"].astype(str) != date_str]
 
-    new_df = pd.DataFrame(selected_rows)
+    new_df = pd.DataFrame(rows)
     combined = pd.concat([existing_df, new_df], ignore_index=True) if not existing_df.empty else new_df
 
     worksheet.clear()
     worksheet.append_row(headers)
 
     if not combined.empty:
-        rows = combined[headers].values.tolist()
-        worksheet.append_rows(rows)
+        combined = combined[headers]
+        worksheet.append_rows(combined.values.tolist())
 
-    return True, "Weekly plan saved to Google Sheets."
+    return True, f"Saved meals for {date_str}."
+
+def load_saved_day(plan_date):
+    logs = read_logs()
+    if logs.empty:
+        return {}
+
+    date_str = str(plan_date)
+    day_logs = logs[logs["plan_date"].astype(str) == date_str]
+
+    saved = {}
+    for _, row in day_logs.iterrows():
+        saved[(row["meal_slot"], row["component_slot"])] = row["component_name"]
+
+    return saved
 
 
 # =========================================================
-# Calculation Helpers
+# Helpers
 # =========================================================
-def week_start_for(selected_date):
-    selected_date = pd.to_datetime(selected_date).date()
-    return selected_date - timedelta(days=selected_date.weekday())
+def component_names(component_slot):
+    return [item["name"] for item in COMPONENTS[component_slot]]
 
-def get_week_days(week_start_date):
-    return [week_start_date + timedelta(days=i) for i in range(7)]
+def get_component(component_slot, name):
+    for item in COMPONENTS[component_slot]:
+        if item["name"] == name:
+            return item
+    return COMPONENTS[component_slot][0]
 
-def flatten_selection(selections, week_start):
+def calculate_totals(selected_components):
+    totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
+    for comp in selected_components:
+        totals["calories"] += comp["calories"]
+        totals["protein"] += comp["protein"]
+        totals["carbs"] += comp["carbs"]
+        totals["fat"] += comp["fat"]
+        totals["cost"] += comp["cost"]
+    return totals
+
+def rows_from_selections(plan_date, selections):
     rows = []
     saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    for day_name, day_data in selections.items():
-        for meal_slot, meal in day_data.items():
-            if meal:
+    for meal_slot, components in selections.items():
+        for component_slot, component in components.items():
+            if component["name"] != "None":
                 rows.append({
                     "saved_at": saved_at,
-                    "week_start": str(week_start),
-                    "day": day_name,
+                    "plan_date": str(plan_date),
                     "meal_slot": meal_slot,
-                    "meal_name": meal["name"],
-                    "calories": meal["calories"],
-                    "protein": meal["protein"],
-                    "carbs": meal["carbs"],
-                    "fat": meal["fat"],
-                    "cost": meal["cost"],
-                    "ingredients_json": json.dumps(meal["ingredients"])
+                    "component_slot": component_slot,
+                    "component_name": component["name"],
+                    "calories": component["calories"],
+                    "protein": component["protein"],
+                    "carbs": component["carbs"],
+                    "fat": component["fat"],
+                    "cost": component["cost"],
+                    "ingredients_json": json.dumps(component["ingredients"])
                 })
     return rows
 
-def calculate_day_totals(day_data):
-    totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
-    for meal in day_data.values():
-        if meal:
-            totals["calories"] += meal["calories"]
-            totals["protein"] += meal["protein"]
-            totals["carbs"] += meal["carbs"]
-            totals["fat"] += meal["fat"]
-            totals["cost"] += meal["cost"]
-    return totals
+def build_dynamic_grocery(selections):
+    groceries = {}
 
-def calculate_week_totals(selections):
-    daily_rows = []
-    for day_name, day_data in selections.items():
-        totals = calculate_day_totals(day_data)
-        daily_rows.append({
-            "Day": day_name,
-            "Calories": totals["calories"],
-            "Protein": totals["protein"],
-            "Carbs": totals["carbs"],
-            "Fat": totals["fat"],
-            "Cost": totals["cost"]
-        })
-    return pd.DataFrame(daily_rows)
+    for meal_components in selections.values():
+        for component in meal_components.values():
+            for ingredient, qty in component["ingredients"].items():
+                groceries[ingredient] = groceries.get(ingredient, 0) + qty
 
-def build_grocery_list(selections):
-    grocery = {}
+    rows = [{"Item": item, "Estimated Amount": qty} for item, qty in groceries.items()]
+    return pd.DataFrame(rows).sort_values("Item") if rows else pd.DataFrame(columns=["Item", "Estimated Amount"])
 
-    for day_data in selections.values():
-        for meal in day_data.values():
-            if meal:
-                for ingredient, qty in meal["ingredients"].items():
-                    grocery[ingredient] = grocery.get(ingredient, 0) + qty
+def summarize_day_from_logs(logs_df, plan_date):
+    date_str = str(plan_date)
+    day_logs = logs_df[logs_df["plan_date"].astype(str) == date_str].copy()
+    if day_logs.empty:
+        return None, pd.DataFrame()
 
-    grocery_rows = []
-    for ingredient, qty in grocery.items():
-        grocery_rows.append({
-            "Item": ingredient,
-            "Estimated Weekly Amount": qty
-        })
+    totals = day_logs[["calories", "protein", "carbs", "fat", "cost"]].sum()
+    return totals, day_logs
 
-    return pd.DataFrame(grocery_rows).sort_values("Item") if grocery_rows else pd.DataFrame(columns=["Item", "Estimated Weekly Amount"])
+def get_recent_dates(logs_df):
+    if logs_df.empty:
+        return []
 
-def meal_by_name(slot, meal_name):
-    for meal in MEAL_OPTIONS[slot]:
-        if meal["name"] == meal_name:
-            return meal
-    return None
-
-def load_saved_week_defaults(week_start):
-    saved = read_saved_logs()
-    if saved.empty:
-        return {}
-
-    week_df = saved[saved["week_start"].astype(str) == str(week_start)]
-    defaults = {}
-
-    for _, row in week_df.iterrows():
-        defaults[(row["day"], row["meal_slot"])] = row["meal_name"]
-
-    return defaults
+    dates = sorted(logs_df["plan_date"].astype(str).unique(), reverse=True)
+    return dates
 
 
 # =========================================================
@@ -546,19 +523,17 @@ def load_saved_week_defaults(week_start):
 # =========================================================
 st.markdown('<p class="main-title">🐻 Pooh Bear Yum Yum Tracker</p>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="subtitle">Client meal plan tracker with dynamic macros, budget, grocery list, and Google Sheets history.</p>',
+    '<p class="subtitle">Dynamic client meal tracker with editable meal components, macros, grocery list, budget, and daily history.</p>',
     unsafe_allow_html=True
 )
 
 
 # =========================================================
-# Sidebar Controls
+# Sidebar
 # =========================================================
 st.sidebar.title("🐝 Client Controls")
 
-selected_date = st.sidebar.date_input("Choose week", value=date.today())
-week_start = week_start_for(selected_date)
-week_days = get_week_days(week_start)
+selected_date = st.sidebar.date_input("Select day/date", value=date.today())
 
 budget_limit = st.sidebar.number_input(
     "Weekly Budget Goal ($)",
@@ -573,21 +548,19 @@ if google_sheets_is_configured():
     st.sidebar.success("Google Sheets connected")
 else:
     st.sidebar.warning("Google Sheets not connected yet")
-    st.sidebar.caption("The app still works, but saved data will not persist after refresh/deploy restart.")
 
-st.sidebar.markdown("---")
-st.sidebar.info("🍯 When in doubt, eat the bagel.")
+st.sidebar.info("🍯 Pick the foods. The tracker does the math.")
 
 
 # =========================================================
-# Load Saved Defaults
+# Load saved day if available
 # =========================================================
-saved_defaults = {}
+saved_day = {}
 if google_sheets_is_configured():
     try:
-        saved_defaults = load_saved_week_defaults(week_start)
+        saved_day = load_saved_day(selected_date)
     except Exception as e:
-        st.sidebar.error("Could not load saved Google Sheets data.")
+        st.sidebar.error("Could not load saved day.")
         st.sidebar.caption(str(e))
 
 
@@ -596,10 +569,10 @@ if google_sheets_is_configured():
 # =========================================================
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🏠 Overview",
-    "✅ Meal Picker",
-    "📊 Weekly Summary",
+    "✅ Daily Meal Builder",
+    "📊 Daily Summary",
     "🛒 Grocery List",
-    "📅 30-Day History"
+    "📅 History"
 ])
 
 
@@ -609,11 +582,11 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 with tab1:
     st.subheader("Client Overview")
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Goal", CLIENT["goal"])
-    col2.metric("Calories", CLIENT["calorie_target"])
-    col3.metric("Protein", CLIENT["protein_target"])
-    col4.metric("Budget", f"${budget_limit}/week")
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Goal", CLIENT["goal"])
+    c2.metric("Calories", CLIENT["calorie_target"])
+    c3.metric("Protein", CLIENT["protein_target"])
+    c4.metric("Budget", f"${budget_limit}/week")
 
     st.markdown(f"""
     <div class="section-card">
@@ -628,130 +601,147 @@ with tab1:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("### How This Tracker Works")
+    st.markdown("### New Meal Builder Logic")
     st.write(
-        "The client chooses meal options for each day. The app updates calories, protein, carbs, fats, cost, "
-        "weekly averages, grocery needs, and budget remaining automatically. When Google Sheets is connected, "
-        "the weekly plan can be saved and reviewed later."
+        "Each meal is split into components: drink, main food, side, and dessert/treat. "
+        "The client starts from a default example day, edits the choices, then saves the selected date. "
+        "Google Sheets stores each date so previous meals can be reviewed later."
     )
 
 
 # =========================================================
-# Meal Picker
+# Daily Meal Builder
 # =========================================================
 selections = {}
 
 with tab2:
-    st.subheader(f"Meal Picker: Week of {week_start.strftime('%b %d, %Y')}")
-    st.caption("Pick one option per meal. Totals update automatically.")
+    st.subheader(f"Daily Meal Builder — {selected_date.strftime('%A, %b %d, %Y')}")
+    st.caption("Each meal starts with an example selection. The client can edit any component.")
 
-    for i, day_date in enumerate(week_days):
-        day_name = day_date.strftime("%A")
-        display_label = f"{day_name} — {day_date.strftime('%b %d')}"
-        selections[day_name] = {}
+    for meal_slot in MEAL_SLOTS:
+        selections[meal_slot] = {}
 
-        with st.expander(display_label, expanded=(i == 0)):
-            for slot in ["Breakfast", "Lunch", "Snack", "Dinner"]:
-                options = ["None"] + [m["name"] for m in MEAL_OPTIONS[slot]]
+        with st.expander(meal_slot, expanded=True):
+            cols = st.columns(4)
 
-                default_meal_name = saved_defaults.get((day_name, slot), "None")
-                default_index = options.index(default_meal_name) if default_meal_name in options else 0
-
-                chosen_name = st.radio(
-                    f"{slot}",
-                    options,
-                    index=default_index,
-                    key=f"{week_start}_{day_name}_{slot}",
-                    horizontal=False
-                )
-
-                chosen_meal = None if chosen_name == "None" else meal_by_name(slot, chosen_name)
-                selections[day_name][slot] = chosen_meal
-
-                if chosen_meal:
-                    st.caption(
-                        f"Calories: {chosen_meal['calories']} | "
-                        f"Protein: {chosen_meal['protein']}g | "
-                        f"Carbs: {chosen_meal['carbs']}g | "
-                        f"Fat: {chosen_meal['fat']}g | "
-                        f"Cost: ${chosen_meal['cost']:.2f} | "
-                        f"{chosen_meal['tags']}"
+            for idx, component_slot in enumerate(COMPONENT_SLOTS):
+                with cols[idx]:
+                    default_name = saved_day.get(
+                        (meal_slot, component_slot),
+                        DEFAULT_DAY_PLAN[meal_slot][component_slot]
                     )
 
-            day_totals = calculate_day_totals(selections[day_name])
+                    options = component_names(component_slot)
+                    default_index = options.index(default_name) if default_name in options else 0
+
+                    chosen_name = st.selectbox(
+                        component_slot,
+                        options,
+                        index=default_index,
+                        key=f"{selected_date}_{meal_slot}_{component_slot}"
+                    )
+
+                    component = get_component(component_slot, chosen_name)
+                    selections[meal_slot][component_slot] = component
+
+                    if component["name"] != "None":
+                        st.caption(
+                            f"{component['calories']} cal | "
+                            f"{component['protein']}g protein | "
+                            f"${component['cost']:.2f}"
+                        )
+
+            meal_totals = calculate_totals(list(selections[meal_slot].values()))
             st.markdown(
-                f"**Daily Total:** {day_totals['calories']} cal | "
-                f"{day_totals['protein']}g protein | "
-                f"${day_totals['cost']:.2f}"
+                f"**{meal_slot} Total:** "
+                f"{meal_totals['calories']} cal | "
+                f"{meal_totals['protein']}g protein | "
+                f"{meal_totals['carbs']}g carbs | "
+                f"{meal_totals['fat']}g fat | "
+                f"${meal_totals['cost']:.2f}"
             )
 
-    selected_rows = flatten_selection(selections, week_start)
+    all_components = []
+    for meal_slot in MEAL_SLOTS:
+        all_components.extend(list(selections[meal_slot].values()))
 
-    col1, col2 = st.columns([1, 2])
-    with col1:
-        if st.button("💾 Save Week to Google Sheets", use_container_width=True):
-            ok, message = save_week_to_sheets(week_start, selected_rows)
-            if ok:
-                st.success(message)
-            else:
-                st.warning(message)
+    daily_totals = calculate_totals(all_components)
 
-    with col2:
-        st.info("Saving replaces the existing saved plan for this selected week.")
+    st.markdown("---")
+    st.subheader("Live Daily Total")
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Calories", f"{daily_totals['calories']:,}")
+    c2.metric("Protein", f"{daily_totals['protein']}g")
+    c3.metric("Carbs", f"{daily_totals['carbs']}g")
+    c4.metric("Fat", f"{daily_totals['fat']}g")
+    c5.metric("Cost", f"${daily_totals['cost']:.2f}")
+
+    rows = rows_from_selections(selected_date, selections)
+
+    if st.button("💾 Save This Day to Google Sheets", use_container_width=True):
+        ok, msg = save_day_to_sheets(selected_date, rows)
+        if ok:
+            st.success(msg)
+        else:
+            st.warning(msg)
 
 
 # =========================================================
-# Weekly Summary
+# Daily Summary
 # =========================================================
 with tab3:
-    st.subheader("Weekly Nutrition + Budget Summary")
+    st.subheader("Daily Meal Summary")
 
-    summary_df = calculate_week_totals(selections)
+    summary_rows = []
+    for meal_slot in MEAL_SLOTS:
+        components = selections[meal_slot]
+        totals = calculate_totals(list(components.values()))
+        summary_rows.append({
+            "Meal": meal_slot,
+            "Drink": components["Drink"]["name"],
+            "Main": components["Main"]["name"],
+            "Side": components["Side"]["name"],
+            "Dessert/Treat": components["Dessert/Treat"]["name"],
+            "Calories": totals["calories"],
+            "Protein": totals["protein"],
+            "Carbs": totals["carbs"],
+            "Fat": totals["fat"],
+            "Cost": totals["cost"]
+        })
 
-    weekly_calories = summary_df["Calories"].sum()
-    weekly_protein = summary_df["Protein"].sum()
-    weekly_cost = summary_df["Cost"].sum()
-    avg_calories = summary_df["Calories"].mean()
-    avg_protein = summary_df["Protein"].mean()
-    avg_cost = summary_df["Cost"].mean()
-    remaining = budget_limit - weekly_cost
-
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Weekly Calories", f"{weekly_calories:,.0f}")
-    col2.metric("Weekly Protein", f"{weekly_protein:,.0f}g")
-    col3.metric("Weekly Cost", f"${weekly_cost:.2f}")
-    col4.metric("Remaining", f"${remaining:.2f}")
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("Avg Calories / Day", f"{avg_calories:,.0f}")
-    col2.metric("Avg Protein / Day", f"{avg_protein:,.0f}g")
-    col3.metric("Avg Cost / Day", f"${avg_cost:.2f}")
-
-    st.progress(min(weekly_cost / budget_limit, 1.0))
-    if weekly_cost <= budget_limit:
-        st.success("Within weekly budget. Honey pot protected. 🍯")
-    else:
-        st.error("Over weekly budget. Swap a premium lunch for a grocery sandwich or lower-cost option.")
-
+    summary_df = pd.DataFrame(summary_rows)
     st.dataframe(summary_df, use_container_width=True, hide_index=True)
 
-    st.subheader("Macro Trend by Day")
-    chart_df = summary_df.set_index("Day")[["Calories", "Protein", "Cost"]]
-    st.line_chart(chart_df)
+    st.subheader("Daily Totals")
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Calories", f"{daily_totals['calories']:,}")
+    c2.metric("Protein", f"{daily_totals['protein']}g")
+    c3.metric("Carbs", f"{daily_totals['carbs']}g")
+    c4.metric("Fat", f"{daily_totals['fat']}g")
+    c5.metric("Cost", f"${daily_totals['cost']:.2f}")
+
+    st.markdown("### Daily Goal Check")
+    if daily_totals["calories"] < 3400:
+        st.warning("Calories are low for a 4,000-calorie bulk day. Add trail mix, milk, or another bagel.")
+    elif daily_totals["calories"] <= 4200:
+        st.success("Calories are in a strong lean-bulk range.")
+    else:
+        st.info("Calories are high. This may be fine for a heavy activity day, but monitor weight gain.")
+
+    if daily_totals["protein"] < 180:
+        st.warning("Protein is below target. Add protein coffee, eggs, chicken, or a protein bar.")
+    else:
+        st.success("Protein target is met.")
 
 
 # =========================================================
 # Grocery List
 # =========================================================
 with tab4:
-    st.subheader("Dynamic Grocery List Based on Selected Meals")
+    st.subheader("Dynamic Grocery List for Selected Day")
 
-    dynamic_grocery_df = build_grocery_list(selections)
-
-    if dynamic_grocery_df.empty:
-        st.warning("No meals selected yet.")
-    else:
-        st.dataframe(dynamic_grocery_df, use_container_width=True, hide_index=True)
+    grocery_df = build_dynamic_grocery(selections)
+    st.dataframe(grocery_df, use_container_width=True, hide_index=True)
 
     st.markdown("---")
     st.subheader("Monthly Buy — 1st of the Month")
@@ -767,7 +757,7 @@ with tab4:
     st.markdown("""
     <div class="section-card">
         <h3>🧊 Mini Fridge Rule</h3>
-        Save mini fridge space for milk, Greek yogurt, boiled eggs, and the current rotisserie chicken.
+        Fridge priority: milk, Greek yogurt, boiled eggs, and the current rotisserie chicken.
         Keep whey, peanut butter, bagels, bananas, trail mix, granola, protein bars, rice cups,
         and bread outside the fridge.
     </div>
@@ -775,46 +765,70 @@ with tab4:
 
 
 # =========================================================
-# 30-Day History
+# History
 # =========================================================
 with tab5:
-    st.subheader("30-Day History")
+    st.subheader("Previous Days / Calendar History")
 
     if not google_sheets_is_configured():
-        st.warning("Connect Google Sheets to store and view 30-day history.")
+        st.warning("Connect Google Sheets to save and view previous days.")
     else:
         try:
-            logs_df = read_saved_logs()
+            logs_df = read_logs()
 
             if logs_df.empty:
-                st.info("No saved history yet. Save a weekly plan first.")
+                st.info("No saved days yet.")
             else:
-                logs_df["saved_at_dt"] = pd.to_datetime(logs_df["saved_at"], errors="coerce")
-                cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
-                recent = logs_df[logs_df["saved_at_dt"] >= cutoff].copy()
+                recent_dates = get_recent_dates(logs_df)
 
-                st.caption("Showing meal selections saved in the last 30 days.")
-                st.dataframe(
-                    recent.drop(columns=["saved_at_dt"], errors="ignore"),
-                    use_container_width=True,
-                    hide_index=True
+                selected_history_date = st.selectbox(
+                    "Select a saved date",
+                    recent_dates,
+                    index=0
                 )
 
-                if not recent.empty:
-                    daily_history = recent.groupby(["week_start", "day"], as_index=False).agg({
-                        "calories": "sum",
-                        "protein": "sum",
-                        "cost": "sum"
-                    })
+                totals, day_logs = summarize_day_from_logs(logs_df, selected_history_date)
 
-                    st.subheader("Recent Daily Totals")
-                    st.dataframe(daily_history, use_container_width=True, hide_index=True)
-                    st.line_chart(daily_history[["calories", "protein", "cost"]])
+                if totals is not None:
+                    c1, c2, c3, c4, c5 = st.columns(5)
+                    c1.metric("Calories", f"{totals['calories']:,.0f}")
+                    c2.metric("Protein", f"{totals['protein']:,.0f}g")
+                    c3.metric("Carbs", f"{totals['carbs']:,.0f}g")
+                    c4.metric("Fat", f"{totals['fat']:,.0f}g")
+                    c5.metric("Cost", f"${totals['cost']:.2f}")
+
+                    st.markdown("### Meals Saved for This Day")
+                    display = day_logs[[
+                        "meal_slot", "component_slot", "component_name",
+                        "calories", "protein", "carbs", "fat", "cost"
+                    ]].copy()
+
+                    st.dataframe(display, use_container_width=True, hide_index=True)
+
+                st.markdown("---")
+                st.subheader("Last 30 Days Summary")
+
+                logs_df["plan_date_dt"] = pd.to_datetime(logs_df["plan_date"], errors="coerce")
+                cutoff = pd.Timestamp.now() - pd.Timedelta(days=30)
+                recent = logs_df[logs_df["plan_date_dt"] >= cutoff].copy()
+
+                daily_history = recent.groupby("plan_date", as_index=False).agg({
+                    "calories": "sum",
+                    "protein": "sum",
+                    "carbs": "sum",
+                    "fat": "sum",
+                    "cost": "sum"
+                }).sort_values("plan_date", ascending=False)
+
+                st.dataframe(daily_history, use_container_width=True, hide_index=True)
+
+                chart_df = daily_history.sort_values("plan_date").set_index("plan_date")[["calories", "protein", "cost"]]
+                st.line_chart(chart_df)
 
         except Exception as e:
-            st.error("Could not read history from Google Sheets.")
+            st.error("Could not load history.")
             st.caption(str(e))
 
 
 st.markdown("---")
-st.caption("Pooh Bear Yum Yum Tracker • Streamlit + Google Sheets • Dynamic client meal plan tracker")
+st.caption("Pooh Bear Yum Yum Tracker • Component-based meal planner • Streamlit + Google Sheets")
