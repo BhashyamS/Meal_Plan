@@ -365,7 +365,15 @@ def clean_df_for_sheets(df, headers):
 
     return rows
 
+def normalize_header(value):
+    return str(value).strip().replace(" ", "_").lower()
+
 def read_sheet(title, headers):
+    """
+    Robust Google Sheets reader.
+    Reads raw values instead of relying on get_all_records(), which can fail
+    with formatted/table-style Google Sheet uploads.
+    """
     ss = get_spreadsheet()
     if ss is None:
         return pd.DataFrame(columns=headers)
@@ -381,19 +389,57 @@ def read_sheet(title, headers):
         return pd.DataFrame(columns=headers)
 
     try:
-        records = ws.get_all_records()
-    except Exception:
+        values = ws.get_all_values()
+    except Exception as e:
+        st.warning(f"Could not read values from tab: {title}")
+        st.caption(str(e))
         return pd.DataFrame(columns=headers)
 
-    if not records:
+    if not values or len(values) < 2:
         return pd.DataFrame(columns=headers)
 
-    df = pd.DataFrame(records)
-    for col in headers:
-        if col not in df.columns:
-            df[col] = ""
+    expected = [normalize_header(h) for h in headers]
+    header_row_idx = None
+    header_values = None
 
-    return df[headers]
+    for i, row in enumerate(values[:10]):
+        normalized = [normalize_header(x) for x in row]
+        matches = sum(1 for h in expected if h in normalized)
+        if matches >= min(3, len(expected)):
+            header_row_idx = i
+            header_values = row
+            break
+
+    if header_row_idx is None:
+        st.warning(f"Could not find expected headers in tab: {title}")
+        st.caption("First row found: " + str(values[0]))
+        return pd.DataFrame(columns=headers)
+
+    normalized_headers = [normalize_header(x) for x in header_values]
+    col_map = {}
+    for expected_col in headers:
+        norm_expected = normalize_header(expected_col)
+        if norm_expected in normalized_headers:
+            col_map[expected_col] = normalized_headers.index(norm_expected)
+
+    data_rows = values[header_row_idx + 1:]
+    parsed_rows = []
+
+    for row in data_rows:
+        if not any(str(x).strip() for x in row):
+            continue
+
+        parsed = {}
+        for col in headers:
+            idx = col_map.get(col)
+            parsed[col] = row[idx] if idx is not None and idx < len(row) else ""
+
+        parsed_rows.append(parsed)
+
+    if not parsed_rows:
+        return pd.DataFrame(columns=headers)
+
+    return pd.DataFrame(parsed_rows)[headers]
 
 def rewrite_sheet(title, headers, df):
     ss = get_spreadsheet()
@@ -1092,7 +1138,17 @@ elif page == "🍽️ Meal Builder":
     food_df = read_food_options()
 
     if food_df.empty:
-        st.warning("No Food_Options found. Upload the Excel tabs into Google Sheets or seed/create the Food_Options tab in History + Budget.")
+        st.warning("No Food_Options found. The app is connected, but it could not parse rows from the Food_Options tab.")
+        ss = get_spreadsheet()
+        if ss is not None:
+            try:
+                ws = find_worksheet(ss, "Food_Options")
+                if ws is not None:
+                    preview = ws.get_all_values()[:5]
+                    st.caption("Food_Options raw preview:")
+                    st.write(preview)
+            except Exception as e:
+                st.caption(str(e))
     else:
         saved = read_daily_logs()
         saved_defaults = {}
