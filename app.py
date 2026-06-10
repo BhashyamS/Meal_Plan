@@ -256,6 +256,18 @@ st.markdown("""
         font-weight: 800;
     }
 
+
+    .filter-status {
+        background: var(--warn-bg);
+        color: var(--warn-text);
+        border: 1px solid var(--warn-border);
+        border-radius: 14px;
+        padding: 12px;
+        margin: 10px 0 14px 0;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1583,68 +1595,101 @@ if page == "🛒 Grocery + Shopping":
             selected_rows = []
 
             st.markdown("### Filter Shopping List")
-            f1, f2 = st.columns(2)
 
-            store_options = sorted([x for x in base["Where to Buy"].dropna().astype(str).unique().tolist() if x.strip()])
-            store_options = ["All Stores"] + store_options
+            if "shopping_store_filter_buttons" not in st.session_state:
+                st.session_state.shopping_store_filter_buttons = []
+            if "shopping_category_filter_buttons" not in st.session_state:
+                st.session_state.shopping_category_filter_buttons = []
 
-            with f1:
-                selected_store = st.selectbox("Store", store_options, index=0, key="shopping_store_filter")
+            st.caption("Stores")
+            store_cols = st.columns(3)
+            with store_cols[0]:
+                if st.button("🏪 Costco", key="filter_costco", use_container_width=True):
+                    stores = st.session_state.shopping_store_filter_buttons
+                    st.session_state.shopping_store_filter_buttons = [s for s in stores if s != "Costco"] if "Costco" in stores else stores + ["Costco"]
+            with store_cols[1]:
+                if st.button("🥬 Sprouts", key="filter_sprouts", use_container_width=True):
+                    stores = st.session_state.shopping_store_filter_buttons
+                    st.session_state.shopping_store_filter_buttons = [s for s in stores if s != "Sprouts"] if "Sprouts" in stores else stores + ["Sprouts"]
+            with store_cols[2]:
+                if st.button("🧹 Clear Stores", key="clear_store_filters", use_container_width=True):
+                    st.session_state.shopping_store_filter_buttons = []
 
-            with f2:
-                selected_category = st.selectbox(
-                    "Category",
-                    ["All Categories", "Monthly", "Weekly", "As Needed"],
-                    index=0,
-                    key="shopping_category_filter",
-                )
+            st.caption("Categories")
+            cat_cols = st.columns(4)
+            with cat_cols[0]:
+                if st.button("📦 Monthly", key="filter_monthly", use_container_width=True):
+                    cats = st.session_state.shopping_category_filter_buttons
+                    st.session_state.shopping_category_filter_buttons = [c for c in cats if c != "Monthly"] if "Monthly" in cats else cats + ["Monthly"]
+            with cat_cols[1]:
+                if st.button("🛒 Weekly", key="filter_weekly", use_container_width=True):
+                    cats = st.session_state.shopping_category_filter_buttons
+                    st.session_state.shopping_category_filter_buttons = [c for c in cats if c != "Weekly"] if "Weekly" in cats else cats + ["Weekly"]
+            with cat_cols[2]:
+                if st.button("✨ As Needed", key="filter_as_needed", use_container_width=True):
+                    cats = st.session_state.shopping_category_filter_buttons
+                    st.session_state.shopping_category_filter_buttons = [c for c in cats if c != "As Needed"] if "As Needed" in cats else cats + ["As Needed"]
+            with cat_cols[3]:
+                if st.button("🧹 Clear Cats", key="clear_category_filters", use_container_width=True):
+                    st.session_state.shopping_category_filter_buttons = []
+
+            search_text = st.text_input("Search items", placeholder="Search whey, yogurt, banana, Costco...", key="shopping_search_text")
+
+            selected_stores = st.session_state.shopping_store_filter_buttons
+            selected_categories = st.session_state.shopping_category_filter_buttons
 
             filtered_base = base.copy()
 
-            if selected_store != "All Stores":
-                filtered_base = filtered_base[filtered_base["Where to Buy"].astype(str) == selected_store]
+            # Store filters stack together using OR within stores.
+            # Costco button also matches 'Costco or Sprouts'.
+            if selected_stores:
+                store_mask = False
+                for store in selected_stores:
+                    store_mask = store_mask | filtered_base["Where to Buy"].astype(str).str.contains(store, case=False, na=False)
+                filtered_base = filtered_base[store_mask]
 
-            if selected_category != "All Categories":
-                filtered_base = filtered_base[filtered_base["Category_Normalized"] == selected_category]
+            # Category filters stack together using OR within categories.
+            if selected_categories:
+                filtered_base = filtered_base[filtered_base["Category_Normalized"].isin(selected_categories)]
 
-            st.caption(f"Showing {len(filtered_base)} item(s).")
+            if search_text.strip():
+                q = search_text.strip()
+                search_mask = (
+                    filtered_base["Item"].astype(str).str.contains(q, case=False, na=False)
+                    | filtered_base["Suggested Buy"].astype(str).str.contains(q, case=False, na=False)
+                    | filtered_base["Where to Buy"].astype(str).str.contains(q, case=False, na=False)
+                    | filtered_base["Category"].astype(str).str.contains(q, case=False, na=False)
+                )
+                filtered_base = filtered_base[search_mask]
 
-            show_monthly = selected_category in ["All Categories", "Monthly"]
-            show_weekly = selected_category in ["All Categories", "Weekly"]
-            show_as_needed = selected_category in ["All Categories", "As Needed"]
+            active_store_text = ", ".join(selected_stores) if selected_stores else "All Stores"
+            active_cat_text = ", ".join(selected_categories) if selected_categories else "All Categories"
+            active_search_text = search_text.strip() if search_text.strip() else "None"
 
-            if show_monthly:
-                with st.expander("📦 Monthly", expanded=(selected_category == "Monthly")):
-                    monthly = filtered_base[filtered_base["Category_Normalized"] == "Monthly"].copy()
-                    if monthly.empty:
-                        st.info("No monthly items match the current filters.")
-                    else:
-                        for idx, row in monthly.iterrows():
-                            result = render_shopping_card(row, f"monthly_{idx}_{selected_store}_{selected_category}")
-                            if result:
-                                selected_rows.append(result)
+            st.markdown(
+                f"""
+                <div class="filter-status">
+                    <b>Active Filters</b><br>
+                    Store: {active_store_text}<br>
+                    Category: {active_cat_text}<br>
+                    Search: {active_search_text}<br>
+                    Showing: {len(filtered_base)} item(s)
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
 
-            if show_weekly:
-                with st.expander("🛒 Weekly", expanded=(selected_category in ["All Categories", "Weekly"])):
-                    weekly = filtered_base[filtered_base["Category_Normalized"] == "Weekly"].copy()
-                    if weekly.empty:
-                        st.info("No weekly items match the current filters.")
-                    else:
-                        for idx, row in weekly.iterrows():
-                            result = render_shopping_card(row, f"weekly_{idx}_{selected_store}_{selected_category}")
-                            if result:
-                                selected_rows.append(result)
-
-            if show_as_needed:
-                with st.expander("✨ As Needed", expanded=(selected_category == "As Needed")):
-                    as_needed = filtered_base[filtered_base["Category_Normalized"] == "As Needed"].copy()
-                    if as_needed.empty:
-                        st.info("No as-needed items match the current filters.")
-                    else:
-                        for idx, row in as_needed.iterrows():
-                            result = render_shopping_card(row, f"as_needed_{idx}_{selected_store}_{selected_category}")
-                            if result:
-                                selected_rows.append(result)
+            st.markdown("### Shopping List")
+            if filtered_base.empty:
+                st.info("No items match the current filters.")
+            else:
+                for idx, row in filtered_base.iterrows():
+                    result = render_shopping_card(
+                        row,
+                        f"filtered_{idx}_{'_'.join(selected_stores) or 'allstores'}_{'_'.join(selected_categories) or 'allcats'}_{search_text}"
+                    )
+                    if result:
+                        selected_rows.append(result)
 
             st.markdown("### Add One-Off Shopping Item")
             with st.expander("➕ Add to this shopping trip only", expanded=False):
