@@ -1582,35 +1582,69 @@ if page == "🛒 Grocery + Shopping":
 
             selected_rows = []
 
-            with st.expander("📦 Monthly", expanded=False):
-                monthly = base[base["Category_Normalized"] == "Monthly"].copy()
-                if monthly.empty:
-                    st.info("No monthly items.")
-                else:
-                    for idx, row in monthly.iterrows():
-                        result = render_shopping_card(row, f"monthly_{idx}")
-                        if result:
-                            selected_rows.append(result)
+            st.markdown("### Filter Shopping List")
+            f1, f2 = st.columns(2)
 
-            with st.expander("🛒 Weekly", expanded=True):
-                weekly = base[base["Category_Normalized"] == "Weekly"].copy()
-                if weekly.empty:
-                    st.info("No weekly items.")
-                else:
-                    for idx, row in weekly.iterrows():
-                        result = render_shopping_card(row, f"weekly_{idx}")
-                        if result:
-                            selected_rows.append(result)
+            store_options = sorted([x for x in base["Where to Buy"].dropna().astype(str).unique().tolist() if x.strip()])
+            store_options = ["All Stores"] + store_options
 
-            with st.expander("✨ As Needed", expanded=False):
-                as_needed = base[base["Category_Normalized"] == "As Needed"].copy()
-                if as_needed.empty:
-                    st.info("No as-needed items.")
-                else:
-                    for idx, row in as_needed.iterrows():
-                        result = render_shopping_card(row, f"as_needed_{idx}")
-                        if result:
-                            selected_rows.append(result)
+            with f1:
+                selected_store = st.selectbox("Store", store_options, index=0, key="shopping_store_filter")
+
+            with f2:
+                selected_category = st.selectbox(
+                    "Category",
+                    ["All Categories", "Monthly", "Weekly", "As Needed"],
+                    index=0,
+                    key="shopping_category_filter",
+                )
+
+            filtered_base = base.copy()
+
+            if selected_store != "All Stores":
+                filtered_base = filtered_base[filtered_base["Where to Buy"].astype(str) == selected_store]
+
+            if selected_category != "All Categories":
+                filtered_base = filtered_base[filtered_base["Category_Normalized"] == selected_category]
+
+            st.caption(f"Showing {len(filtered_base)} item(s).")
+
+            show_monthly = selected_category in ["All Categories", "Monthly"]
+            show_weekly = selected_category in ["All Categories", "Weekly"]
+            show_as_needed = selected_category in ["All Categories", "As Needed"]
+
+            if show_monthly:
+                with st.expander("📦 Monthly", expanded=(selected_category == "Monthly")):
+                    monthly = filtered_base[filtered_base["Category_Normalized"] == "Monthly"].copy()
+                    if monthly.empty:
+                        st.info("No monthly items match the current filters.")
+                    else:
+                        for idx, row in monthly.iterrows():
+                            result = render_shopping_card(row, f"monthly_{idx}_{selected_store}_{selected_category}")
+                            if result:
+                                selected_rows.append(result)
+
+            if show_weekly:
+                with st.expander("🛒 Weekly", expanded=(selected_category in ["All Categories", "Weekly"])):
+                    weekly = filtered_base[filtered_base["Category_Normalized"] == "Weekly"].copy()
+                    if weekly.empty:
+                        st.info("No weekly items match the current filters.")
+                    else:
+                        for idx, row in weekly.iterrows():
+                            result = render_shopping_card(row, f"weekly_{idx}_{selected_store}_{selected_category}")
+                            if result:
+                                selected_rows.append(result)
+
+            if show_as_needed:
+                with st.expander("✨ As Needed", expanded=(selected_category == "As Needed")):
+                    as_needed = filtered_base[filtered_base["Category_Normalized"] == "As Needed"].copy()
+                    if as_needed.empty:
+                        st.info("No as-needed items match the current filters.")
+                    else:
+                        for idx, row in as_needed.iterrows():
+                            result = render_shopping_card(row, f"as_needed_{idx}_{selected_store}_{selected_category}")
+                            if result:
+                                selected_rows.append(result)
 
             st.markdown("### Add One-Off Shopping Item")
             with st.expander("➕ Add to this shopping trip only", expanded=False):
