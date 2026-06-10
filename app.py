@@ -1396,7 +1396,7 @@ elif page == "🛒 Grocery + Shopping":
                 "low_stock_at": "Low Stock At",
             })
 
-            base["Buy"] = True
+            base["Buy"] = False
             base["Suggested Qty"] = pd.to_numeric(base["Suggested Qty"], errors="coerce").fillna(0)
             base["Default Price"] = pd.to_numeric(base["Default Price"], errors="coerce").fillna(0)
             base["Qty Bought"] = base["Suggested Qty"]
@@ -1406,31 +1406,66 @@ elif page == "🛒 Grocery + Shopping":
             )
             base["Total Cost"] = base["Qty Bought"] * base["Unit Price"]
 
-            view = base[[
-                "Buy", "Item", "Category", "Suggested Qty", "Qty Bought",
-                "Unit", "Unit Price", "Total Cost", "Storage", "Low Stock At"
-            ]]
+            compact_cols = ["Buy", "Item", "Qty Bought", "Unit", "Unit Price", "Total Cost"]
 
-            edited = st.data_editor(
-                view,
-                use_container_width=True,
-                hide_index=True,
-                num_rows="dynamic",
-                column_config={
-                    "Buy": st.column_config.CheckboxColumn("Buy"),
-                    "Qty Bought": st.column_config.NumberColumn("Qty Bought", min_value=0.0, step=1.0),
-                    "Unit Price": st.column_config.NumberColumn("Unit Price", min_value=0.0, step=0.25, format="$%.2f"),
-                    "Total Cost": st.column_config.NumberColumn("Total Cost", min_value=0.0, step=0.25, format="$%.2f"),
-                },
-            )
+            def shopping_editor(section_label, df_section, key_suffix):
+                st.markdown(f"### {section_label}")
+                if df_section.empty:
+                    st.info(f"No {section_label.lower()} items.")
+                    return pd.DataFrame(columns=base.columns)
 
-            edited["Qty Bought"] = pd.to_numeric(edited["Qty Bought"], errors="coerce").fillna(0)
-            edited["Unit Price"] = pd.to_numeric(edited["Unit Price"], errors="coerce").fillna(0)
-            edited["Total Cost"] = (edited["Qty Bought"] * edited["Unit Price"]).round(2)
+                edited_section = st.data_editor(
+                    df_section[compact_cols],
+                    use_container_width=True,
+                    hide_index=True,
+                    num_rows="dynamic",
+                    height=min(420, 72 + 36 * max(len(df_section), 2)),
+                    key=f"shopping_editor_{key_suffix}",
+                    column_config={
+                        "Buy": st.column_config.CheckboxColumn("Buy", width="small"),
+                        "Item": st.column_config.TextColumn("Item", width="medium"),
+                        "Qty Bought": st.column_config.NumberColumn("Qty", min_value=0.0, step=1.0, width="small"),
+                        "Unit": st.column_config.TextColumn("Unit", width="small"),
+                        "Unit Price": st.column_config.NumberColumn("Price", min_value=0.0, step=0.25, format="$%.2f", width="small"),
+                        "Total Cost": st.column_config.NumberColumn("Total", min_value=0.0, step=0.25, format="$%.2f", width="small"),
+                    },
+                    disabled=["Item", "Unit", "Total Cost"],
+                )
 
-            selected = edited[(edited["Buy"] == True) & (edited["Qty Bought"] > 0)].copy()
+                edited_section["Qty Bought"] = pd.to_numeric(edited_section["Qty Bought"], errors="coerce").fillna(0)
+                edited_section["Unit Price"] = pd.to_numeric(edited_section["Unit Price"], errors="coerce").fillna(0)
+                edited_section["Total Cost"] = (edited_section["Qty Bought"] * edited_section["Unit Price"]).round(2)
+
+                # Reattach hidden columns.
+                hidden = df_section[["Item", "Category", "Storage", "Low Stock At", "Suggested Qty"]].copy()
+                merged = edited_section.merge(hidden, on="Item", how="left")
+                return merged
+
+            base["category_lower"] = base["Category"].astype(str).str.strip().str.lower()
+
+            monthly_base = base[base["category_lower"] == "monthly"].copy()
+            weekly_base = base[base["category_lower"] == "weekly"].copy()
+            as_needed_base = base[~base["category_lower"].isin(["monthly", "weekly"])].copy()
+
+            edited_monthly = shopping_editor("🗓️ Monthly", monthly_base, "monthly")
+            edited_weekly = shopping_editor("📅 Weekly", weekly_base, "weekly")
+            edited_as_needed = shopping_editor("✨ As Needed", as_needed_base, "as_needed")
+
+            edited = pd.concat([edited_monthly, edited_weekly, edited_as_needed], ignore_index=True)
+            if not edited.empty:
+                edited["Buy"] = edited["Buy"].fillna(False)
+                edited["Qty Bought"] = pd.to_numeric(edited["Qty Bought"], errors="coerce").fillna(0)
+                edited["Unit Price"] = pd.to_numeric(edited["Unit Price"], errors="coerce").fillna(0)
+                edited["Total Cost"] = (edited["Qty Bought"] * edited["Unit Price"]).round(2)
+
+            selected = edited[(edited["Buy"] == True) & (edited["Qty Bought"] > 0)].copy() if not edited.empty else pd.DataFrame()
             total = float(selected["Total Cost"].sum()) if not selected.empty else 0
+
+            st.markdown("---")
             st.metric("Shopping Total", f"${total:.2f}")
+            if not selected.empty:
+                st.caption("Selected items only:")
+                st.dataframe(selected[["Item", "Qty Bought", "Unit", "Unit Price", "Total Cost"]], use_container_width=True, hide_index=True)
 
             st.markdown("### Add One-Off Shopping Item")
             with st.expander("➕ Add to this shopping trip only", expanded=False):
@@ -1449,13 +1484,13 @@ elif page == "🛒 Grocery + Shopping":
                         "shopping_id": shopping_id,
                         "saved_at": saved_at,
                         "item": r["Item"],
-                        "category": r["Category"],
+                        "category": r.get("Category", ""),
                         "qty_bought": r["Qty Bought"],
                         "unit": r["Unit"],
                         "unit_price": r["Unit Price"],
                         "total_cost": r["Total Cost"],
-                        "storage": r["Storage"],
-                        "low_stock_at": r["Low Stock At"],
+                        "storage": r.get("Storage", ""),
+                        "low_stock_at": r.get("Low Stock At", 0),
                     })
 
                 if custom_item and custom_qty > 0:
@@ -1463,7 +1498,7 @@ elif page == "🛒 Grocery + Shopping":
                         "shopping_id": shopping_id,
                         "saved_at": saved_at,
                         "item": custom_item,
-                        "category": "Custom",
+                        "category": "As needed",
                         "qty_bought": custom_qty,
                         "unit": custom_unit,
                         "unit_price": custom_unit_price,
