@@ -693,6 +693,31 @@ def enrich_grocery_for_shopping(grocery_df):
     return df
 
 
+
+def read_daily_logs():
+    df = read_sheet("Daily_Logs", daily_headers())
+    for col in ["calories", "protein", "carbs", "fat", "cost"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
+def read_shopping_trips():
+    df = read_sheet("Shopping_Trips", shopping_headers())
+    for col in ["qty_bought", "unit_price", "total_cost"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
+def read_inventory():
+    df = read_sheet("Inventory", inventory_headers())
+    for col in ["qty_on_hand", "last_unit_price", "low_stock_at"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
+def read_budget_logs():
+    df = read_sheet("Budget_Log", budget_headers())
+    df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
+    return df
+
+
 # =========================================================
 # SETUP / REPAIR
 # =========================================================
