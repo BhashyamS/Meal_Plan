@@ -230,16 +230,20 @@ def get_or_create_worksheet(spreadsheet, title, headers):
         ws = spreadsheet.worksheet(title)
     except Exception:
         try:
-            ws = spreadsheet.add_worksheet(title=title, rows=50, cols=max(8, len(headers)))
+            ws = spreadsheet.add_worksheet(title=title, rows=100, cols=max(12, len(headers)))
             ws.update("A1", [headers])
             return ws
-        except Exception:
+        except Exception as e:
+            # Return None and let the caller show clean setup instructions.
             return None
+
     try:
-        if not ws.row_values(1):
+        first_row = ws.row_values(1)
+        if not first_row:
             ws.update("A1", [headers])
     except Exception:
         pass
+
     return ws
 
 def clean_df_for_sheets(df, headers):
@@ -484,6 +488,9 @@ def setup_required_tabs(seed_defaults=False):
         return False, "Google Sheets is not connected."
 
     ss = get_spreadsheet()
+    if ss is None:
+        return False, "Could not open the Google Sheet. Check spreadsheet_name and sharing permissions."
+
     required = [
         ("Food_Options", food_options_headers()),
         ("Food_Coach_Input", grocery_headers()),
@@ -492,18 +499,31 @@ def setup_required_tabs(seed_defaults=False):
         ("Inventory", inventory_headers()),
         ("Budget_Log", budget_headers()),
     ]
+
+    failed_tabs = []
+
     for title, headers in required:
         ws = get_or_create_worksheet(ss, title, headers)
         if ws is None:
-            return False, f"Could not create/access {title}"
+            failed_tabs.append(title)
+
+    if failed_tabs:
+        return False, "Could not auto-create/access: " + ", ".join(failed_tabs) + ". Manually create these tabs in Google Sheets, then paste the header rows from the setup section below."
 
     if seed_defaults:
         food_df = read_sheet("Food_Options", food_options_headers())
         grocery_df = read_sheet("Food_Coach_Input", grocery_headers())
+
         if food_df.empty or food_df["option_name"].astype(str).str.strip().eq("").all():
-            rewrite_sheet("Food_Options", food_options_headers(), pd.DataFrame(DEFAULT_FOOD_OPTIONS, columns=food_options_headers()))
+            ok, msg = rewrite_sheet("Food_Options", food_options_headers(), pd.DataFrame(DEFAULT_FOOD_OPTIONS, columns=food_options_headers()))
+            if not ok:
+                return False, "Could not seed Food_Options. Manually paste the default rows."
+
         if grocery_df.empty or grocery_df["item"].astype(str).str.strip().eq("").all():
-            rewrite_sheet("Food_Coach_Input", grocery_headers(), pd.DataFrame(DEFAULT_GROCERY, columns=grocery_headers()))
+            ok, msg = rewrite_sheet("Food_Coach_Input", grocery_headers(), pd.DataFrame(DEFAULT_GROCERY, columns=grocery_headers()))
+            if not ok:
+                return False, "Could not seed Food_Coach_Input. Manually paste the default rows."
+
         st.cache_data.clear()
 
     return True, "Required tabs are ready."
@@ -1125,10 +1145,38 @@ elif page == "📊 History + Budget":
             st.caption("Use this only if Google Sheets tabs are missing or broken.")
             if st.button("Create / Repair Required Google Sheet Tabs"):
                 ok, msg = setup_required_tabs(seed_defaults=False)
-                st.success(msg) if ok else st.error(msg)
+                if ok:
+                    st.success(msg)
+                else:
+                    st.error(str(msg))
+
             if st.button("Seed Default Food_Options + Food_Coach_Input"):
                 ok, msg = setup_required_tabs(seed_defaults=True)
-                st.success("Default editable sheet data seeded. Refresh the app.") if ok else st.error(msg)
+                if ok:
+                    st.success("Default editable sheet data seeded. Refresh the app.")
+                else:
+                    st.error(str(msg))
+
+            st.markdown("#### Manual setup headers")
+            st.caption("If the buttons fail, manually create these tabs in your Google Sheet and paste the matching header into row 1.")
+
+            st.write("Food_Options")
+            st.code("\t".join(food_options_headers()))
+
+            st.write("Food_Coach_Input")
+            st.code("\t".join(grocery_headers()))
+
+            st.write("Daily_Logs")
+            st.code("\t".join(daily_headers()))
+
+            st.write("Shopping_Trips")
+            st.code("\t".join(shopping_headers()))
+
+            st.write("Inventory")
+            st.code("\t".join(inventory_headers()))
+
+            st.write("Budget_Log")
+            st.code("\t".join(budget_headers()))
 
     logs = read_daily_logs()
     if logs.empty:
