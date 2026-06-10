@@ -26,34 +26,114 @@ st.set_page_config(
 # =========================================================
 st.markdown("""
 <style>
+    :root {
+        --app-bg: #ffffff;
+        --app-text: #1f2933;
+        --app-muted: #5f6b7a;
+
+        --honey: #C47F00;
+        --honey-bright: #B96B00;
+        --honey-soft: #FFF4CC;
+        --honey-border: #E8B64B;
+
+        --bear: #5C3B1E;
+        --bear-soft: #FFF7E6;
+
+        --card-bg: #ffffff;
+        --card-border: #E5E7EB;
+        --dark-card-bg: #ffffff;
+
+        --kpi-bg: #ffffff;
+        --kpi-border: #D6DCE5;
+        --kpi-text: #1f2933;
+
+        --success-bg: #EAF7EF;
+        --success-border: #6BCB88;
+        --success-text: #14532D;
+
+        --warning-bg: #FFF7E6;
+        --warning-border: #E8B64B;
+        --warning-text: #5C3B1E;
+
+        --button-bg: #FFF7E6;
+        --button-text: #5C3B1E;
+        --button-hover: #FFE8A3;
+
+        --shadow: rgba(15, 23, 42, 0.10);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --app-bg: #0E1117;
+            --app-text: #F8FAFC;
+            --app-muted: #B8C0CC;
+
+            --honey: #FFD95A;
+            --honey-bright: #F4C542;
+            --honey-soft: #2B1A0B;
+            --honey-border: #F4C542;
+
+            --bear: #FFD95A;
+            --bear-soft: #21170C;
+
+            --card-bg: #16191f;
+            --card-border: #30343d;
+            --dark-card-bg: #11151c;
+
+            --kpi-bg: #11151c;
+            --kpi-border: #30343d;
+            --kpi-text: #F8FAFC;
+
+            --success-bg: #102318;
+            --success-border: #245c35;
+            --success-text: #D1FAE5;
+
+            --warning-bg: #3a2411;
+            --warning-border: #cc8a22;
+            --warning-text: #FFF7E6;
+
+            --button-bg: #17120A;
+            --button-text: #FFD95A;
+            --button-hover: #2B1A0B;
+
+            --shadow: rgba(0, 0, 0, 0.25);
+        }
+    }
+
+    .stApp {
+        color: var(--app-text);
+    }
+
     .hero-wrap {
         text-align: center;
-        background: radial-gradient(circle at top, #5C3B1E 0%, #23160B 45%, #0E1117 100%);
-        border: 1px solid #F4C542;
+        background:
+            radial-gradient(circle at top, rgba(255,217,90,0.38) 0%, rgba(255,217,90,0.12) 34%, transparent 70%),
+            linear-gradient(135deg, var(--honey-soft), var(--card-bg));
+        border: 1px solid var(--honey-border);
         border-radius: 28px;
         padding: 28px 18px;
         margin-bottom: 22px;
-        box-shadow: 0 0 25px rgba(244, 197, 66, 0.18);
+        box-shadow: 0 0 25px var(--shadow);
     }
 
     .hero-title {
         font-size: 44px;
         font-weight: 950;
-        color: #FFD95A;
+        color: var(--honey);
         margin-bottom: 6px;
         line-height: 1.05;
-        text-shadow: 0 3px 0 #5C3B1E;
+        text-shadow: 0 2px 0 rgba(92,59,30,0.35);
     }
 
     .hero-subtitle {
         font-size: 17px;
-        color: #FFF2C7;
+        color: var(--app-text);
         margin-bottom: 0px;
     }
 
     .honey-pill {
         display: inline-block;
-        background: #FFD95A;
+        background: var(--honey);
         color: #3B2A1A;
         padding: 6px 14px;
         border-radius: 999px;
@@ -63,42 +143,58 @@ st.markdown("""
     }
 
     .section-card {
-        background: linear-gradient(135deg, #FFF7E6, #FCEFCB);
-        color: #3B2A1A;
+        background: linear-gradient(135deg, var(--bear-soft), var(--card-bg));
+        color: var(--app-text);
         padding: 18px;
         border-radius: 18px;
-        border: 1px solid #F4D28A;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: 1px solid var(--honey-border);
+        box-shadow: 0 4px 15px var(--shadow);
         margin-bottom: 16px;
         font-size: 15px;
         line-height: 1.6;
     }
 
     .section-card h3 {
-        color: #5C3B1E;
+        color: var(--bear);
         margin-top: 0;
         margin-bottom: 8px;
     }
 
-    .dark-card {
-        background: #16191f;
-        border: 1px solid #30343d;
-        padding: 16px;
+    .dark-card,
+    .component-block {
+        background: var(--card-bg);
+        color: var(--app-text);
+        border: 1px solid var(--card-border);
         border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 14px;
+        box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .meal-total,
+    .grocery-cost-note {
+        background: var(--success-bg);
+        color: var(--success-text);
+        border: 1px solid var(--success-border);
+        padding: 12px;
+        border-radius: 12px;
+        margin-top: 8px;
         margin-bottom: 14px;
     }
 
-    .meal-total {
-        background: #102318;
-        border: 1px solid #245c35;
-        padding: 12px;
-        border-radius: 12px;
-        margin-top: 10px;
+    .warning-card {
+        background: var(--warning-bg);
+        color: var(--warning-text);
+        border: 1px solid var(--warning-border);
+        padding: 14px;
+        border-radius: 14px;
+        margin-bottom: 12px;
     }
 
     .kpi-card {
-        background: #11151c;
-        border: 1px solid #30343d;
+        background: var(--kpi-bg);
+        color: var(--kpi-text);
+        border: 1px solid var(--kpi-border);
         border-radius: 16px;
         padding: 14px;
         margin-top: 10px;
@@ -106,38 +202,61 @@ st.markdown("""
     }
 
     .kpi-card b {
-        color: #FFD95A;
+        color: var(--honey);
+    }
+
+    .component-full-name {
+        color: var(--app-text);
+        font-weight: 800;
+        font-size: 15px;
+        margin: 6px 0 8px 0;
+        word-break: break-word;
+        overflow-wrap: anywhere;
     }
 
     div[data-testid="stMetric"] {
-        background: #11151c;
-        border: 1px solid #30343d;
+        background: var(--kpi-bg);
+        color: var(--kpi-text);
+        border: 1px solid var(--kpi-border);
         padding: 14px;
         border-radius: 14px;
+        box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    div[data-testid="stMetric"] label,
+    div[data-testid="stMetric"] div {
+        color: var(--kpi-text) !important;
     }
 
     div.stButton > button {
         width: 100%;
         border-radius: 999px;
-        border: 1px solid #F4C542;
-        background: #17120A;
-        color: #FFD95A;
+        border: 1px solid var(--honey-border);
+        background: var(--button-bg);
+        color: var(--button-text);
         font-weight: 800;
         padding: 0.7rem 1rem;
     }
 
     div.stButton > button:hover {
-        border-color: #FFF2C7;
-        background: #2B1A0B;
-        color: #FFF2C7;
+        border-color: var(--honey);
+        background: var(--button-hover);
+        color: var(--button-text);
     }
 
     .footer-honey {
         text-align: center;
-        color: #FFD95A;
+        color: var(--honey);
         font-weight: 800;
         padding: 18px;
         margin-top: 28px;
+    }
+
+    /* Dataframes / editors */
+    [data-testid="stDataFrame"],
+    [data-testid="stDataEditor"] {
+        border-radius: 14px;
+        overflow: hidden;
     }
 
     @media (max-width: 768px) {
@@ -476,6 +595,9 @@ def inventory_headers():
 def budget_headers():
     return ["date", "type", "description", "amount"]
 
+def food_coach_headers():
+    return ["item", "category", "suggested_qty", "unit", "default_price", "storage", "low_stock_at", "notes"]
+
 
 # =========================================================
 # DATA READ / WRITE
@@ -502,6 +624,25 @@ def read_budget_logs():
     df = read_sheet("Budget_Log", budget_headers())
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
     return df
+
+def read_food_coach_input():
+    df = read_sheet("Food_Coach_Input", food_coach_headers())
+    for col in ["suggested_qty", "default_price", "low_stock_at"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
+def append_food_coach_item(item, category, qty, unit, price, storage, low_stock_at, notes):
+    df = pd.DataFrame([{
+        "item": item,
+        "category": category,
+        "suggested_qty": float(qty),
+        "unit": unit,
+        "default_price": float(price),
+        "storage": storage,
+        "low_stock_at": float(low_stock_at),
+        "notes": notes,
+    }])
+    return append_sheet("Food_Coach_Input", food_coach_headers(), df)
 
 def setup_required_tabs():
     """
@@ -695,7 +836,21 @@ def grocery_from_selections(selections):
         for comp in meal_data["components"].values():
             for item, qty in comp["ingredients"].items():
                 items[item] = items.get(item, 0) + qty
-    return pd.DataFrame([{"Item": k, "Estimated Used": v} for k, v in items.items()]).sort_values("Item") if items else pd.DataFrame(columns=["Item", "Estimated Used"])
+
+    if not items:
+        return pd.DataFrame(columns=["Item", "Estimated Used", "Unit Cost", "Estimated Cost Used"])
+
+    prices = item_unit_price_lookup()
+    rows = []
+    for item, qty in items.items():
+        unit_cost = float(prices.get(item, 0))
+        rows.append({
+            "Item": item,
+            "Estimated Used": qty,
+            "Unit Cost": round(unit_cost, 2),
+            "Estimated Cost Used": round(unit_cost * float(qty), 2)
+        })
+    return pd.DataFrame(rows).sort_values("Item")
 
 def low_stock_alerts():
     inv = read_inventory()
@@ -732,13 +887,44 @@ def spending_summary():
 
     return pd.DataFrame(rows)
 
+def get_recommended_grocery_items():
+    coach_df = read_food_coach_input()
+    if not coach_df.empty and coach_df["item"].astype(str).str.strip().ne("").any():
+        df = coach_df.copy()
+        df = df[df["item"].astype(str).str.strip() != ""]
+        df = df.rename(columns={
+            "item": "Item",
+            "category": "Category",
+            "suggested_qty": "Suggested Qty",
+            "unit": "Unit",
+            "default_price": "Default Price",
+            "storage": "Storage",
+            "low_stock_at": "Low Stock At",
+        })
+        return df[["Item", "Category", "Suggested Qty", "Unit", "Default Price", "Storage", "Low Stock At"]]
+    return pd.DataFrame(GENERAL_GROCERY)
+
 def make_shopping_base_list():
-    base = pd.DataFrame(GENERAL_GROCERY)
+    base = get_recommended_grocery_items()
     base["Buy"] = True
+    base["Suggested Qty"] = pd.to_numeric(base["Suggested Qty"], errors="coerce").fillna(0)
+    base["Default Price"] = pd.to_numeric(base["Default Price"], errors="coerce").fillna(0)
     base["Qty Bought"] = base["Suggested Qty"]
-    base["Unit Price"] = (base["Default Price"] / base["Suggested Qty"]).round(2)
+    base["Unit Price"] = base.apply(lambda r: round(float(r["Default Price"]) / float(r["Suggested Qty"]), 2) if float(r["Suggested Qty"]) > 0 else 0, axis=1)
     base["Total Cost"] = base["Default Price"]
     return base[["Buy", "Item", "Category", "Suggested Qty", "Qty Bought", "Unit", "Unit Price", "Total Cost", "Storage", "Low Stock At"]]
+
+def item_unit_price_lookup():
+    lookup = {}
+    grocery_df = get_recommended_grocery_items()
+    for _, r in grocery_df.iterrows():
+        item = str(r["Item"])
+        qty = float(pd.to_numeric(r["Suggested Qty"], errors="coerce") or 0)
+        price = float(pd.to_numeric(r["Default Price"], errors="coerce") or 0)
+        lookup[item] = price / qty if qty > 0 else price
+    for r in RESTAURANT_ITEMS:
+        lookup[r["Item"]] = float(r["Default Price"])
+    return lookup
 
 
 # =========================================================
@@ -880,45 +1066,46 @@ elif page == "🍽️ Meal Builder":
             )
             selections[meal_slot]["include"] = include_meal
 
-            cols = st.columns(4)
-            for i, component_slot in enumerate(COMPONENT_SLOTS):
-                with cols[i]:
-                    options = component_names(component_slot, meal_slot)
-                    default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
-                    default_index = options.index(default_name) if default_name in options else 0
+            for component_slot in COMPONENT_SLOTS:
+                st.markdown("<div class='component-block'>", unsafe_allow_html=True)
+                options = component_names(component_slot, meal_slot)
+                default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
+                default_index = options.index(default_name) if default_name in options else 0
 
-                    chosen = st.selectbox(
-                        component_slot,
-                        options,
-                        index=default_index,
-                        key=f"{selected_date}_{meal_slot}_{component_slot}"
-                    )
+                chosen = st.selectbox(
+                    component_slot,
+                    options,
+                    index=default_index,
+                    key=f"{selected_date}_{meal_slot}_{component_slot}"
+                )
 
-                    if chosen == "Other / Custom":
-                        st.caption("Enter custom nutrition values")
-                        custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
-                        custom_cal = st.number_input("Calories", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
-                        custom_pro = st.number_input("Protein (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
-                        custom_carbs = st.number_input("Carbs (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
-                        custom_fat = st.number_input("Fat (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
-                        custom_cost = st.number_input("Cost ($)", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
-                        comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
-                    else:
-                        comp = get_component(component_slot, chosen)
+                if chosen == "Other / Custom":
+                    st.caption("Enter custom nutrition values")
+                    custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
+                    custom_cal = st.number_input("Calories", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
+                    custom_pro = st.number_input("Protein (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
+                    custom_carbs = st.number_input("Carbs (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
+                    custom_fat = st.number_input("Fat (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
+                    custom_cost = st.number_input("Cost ($)", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
+                    comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
+                else:
+                    comp = get_component(component_slot, chosen)
 
-                    selections[meal_slot]["components"][component_slot] = comp
+                selections[meal_slot]["components"][component_slot] = comp
 
-                    st.markdown(
-                        f"""
-                        <div class="kpi-card">
-                            <b>{component_slot} KPI</b><br>
-                            {comp['calories']:.0f} cal<br>
-                            {comp['protein']:.0f}g protein<br>
-                            ${comp['cost']:.2f}
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
+                st.markdown(
+                    f"""
+                    <div class="kpi-card">
+                        <b>{component_slot} KPI</b>
+                        <div class="component-full-name">{comp['name']}</div>
+                        {comp['calories']:.0f} cal<br>
+                        {comp['protein']:.0f}g protein<br>
+                        ${comp['cost']:.2f}
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                st.markdown("</div>", unsafe_allow_html=True)
 
             if include_meal:
                 totals = totals_from_components(list(selections[meal_slot]["components"].values()))
@@ -956,7 +1143,13 @@ elif page == "🍽️ Meal Builder":
             st.warning(msg)
 
     st.subheader("Grocery Use From This Day")
-    st.dataframe(grocery_from_selections(selections), use_container_width=True, hide_index=True)
+    grocery_used_df = grocery_from_selections(selections)
+    st.dataframe(grocery_used_df, use_container_width=True, hide_index=True)
+    used_cost = float(grocery_used_df["Estimated Cost Used"].sum()) if not grocery_used_df.empty and "Estimated Cost Used" in grocery_used_df.columns else 0
+    st.markdown(
+        f"<div class='grocery-cost-note'><b>Estimated grocery value used today:</b> ${used_cost:.2f}</div>",
+        unsafe_allow_html=True
+    )
 
 
 # =========================================================
@@ -967,13 +1160,41 @@ elif page == "🛒 Grocery + Shopping":
     weekly_budget = st.number_input("Weekly budget", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5, key="grocery_budget")
     st.metric("Daily Budget Target", f"${weekly_budget / 7:.2f}")
 
+    st.markdown("### Food Coach Recommended Grocery Plan")
+    coach_items_df = get_recommended_grocery_items()
+    st.dataframe(coach_items_df, use_container_width=True, hide_index=True)
+
     st.markdown("### Monthly Buy")
-    monthly_df = pd.DataFrame(GENERAL_MONTHLY)
+    monthly_df = coach_items_df[coach_items_df["Category"].astype(str).str.lower() == "monthly"] if not coach_items_df.empty else pd.DataFrame(GENERAL_MONTHLY)
     st.dataframe(monthly_df, use_container_width=True, hide_index=True)
 
     st.markdown("### Weekly Refill")
-    weekly_df = pd.DataFrame(GENERAL_WEEKLY)
+    weekly_df = coach_items_df[coach_items_df["Category"].astype(str).str.lower() == "weekly"] if not coach_items_df.empty else pd.DataFrame(GENERAL_WEEKLY)
     st.dataframe(weekly_df, use_container_width=True, hide_index=True)
+
+    st.markdown("### Add Item to Food Coach Input")
+    with st.expander("➕ Add custom grocery item", expanded=False):
+        c1, c2 = st.columns(2)
+        with c1:
+            new_item = st.text_input("Item name")
+            new_category = st.selectbox("Category", ["Weekly", "Monthly", "Restaurant", "Custom"])
+            new_qty = st.number_input("Suggested quantity", min_value=0.0, value=1.0, step=1.0)
+            new_unit = st.text_input("Unit", value="serving")
+        with c2:
+            new_price = st.number_input("Default total price", min_value=0.0, value=0.0, step=0.25)
+            new_storage = st.text_input("Storage", value="Room temp")
+            new_low = st.number_input("Low stock alert at", min_value=0.0, value=1.0, step=1.0)
+            new_notes = st.text_input("Notes", value="")
+
+        if st.button("Save Item to Food Coach Input"):
+            if not new_item.strip():
+                st.warning("Add an item name first.")
+            else:
+                ok, msg = append_food_coach_item(new_item, new_category, new_qty, new_unit, new_price, new_storage, new_low, new_notes)
+                if ok:
+                    st.success("Item saved to Food_Coach_Input. Refresh the app to see it in the list.")
+                else:
+                    st.warning(msg)
 
     st.markdown("---")
     shopping_mode = st.toggle("🛒 Turn On Shopping Mode", value=False)
