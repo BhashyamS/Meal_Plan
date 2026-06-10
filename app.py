@@ -908,7 +908,7 @@ elif page == "🍽️ Meal Builder":
     for meal_slot in ["Breakfast", "Lunch", "Snack", "Dinner"]:
         selections[meal_slot] = {"include": False, "components": {}}
         with st.expander(meal_slot, expanded=True):
-            include = st.checkbox(f"Include {meal_slot}", value=True, key=f"{selected_date}_{meal_slot}_include")
+            include = st.checkbox(f"Include {meal_slot}", value=False, key=f"{selected_date}_{meal_slot}_include")
             selections[meal_slot]["include"] = include
 
             cols = st.columns(4)
@@ -948,7 +948,7 @@ elif page == "🍽️ Meal Builder":
                     unsafe_allow_html=True
                 )
             else:
-                st.warning(f"{meal_slot} is skipped. It will not be saved or deducted.")
+                pass
 
     all_components = []
     for m in selections.values():
@@ -984,11 +984,16 @@ elif page == "🍽️ Meal Builder":
 
     deduct = st.checkbox("Deduct used grocery inventory when saving", value=True)
     if st.button("💾 Save Included Meals + Update Inventory", use_container_width=True):
-        ok, msg = save_day(selected_date, selections, deduct=deduct)
-        if ok:
-            st.success(msg)
+        included_count = sum(1 for meal_data in selections.values() if meal_data["include"])
+
+        if included_count == 0:
+            st.warning("Pick at least one meal before saving. Check the meal boxes you ate today.")
         else:
-            st.warning(msg)
+            ok, msg = save_day(selected_date, selections, deduct=deduct)
+            if ok:
+                st.success("Good job eating today! Very proud of you! 🐻🍯")
+            else:
+                st.warning(msg)
 
 
 # =========================================================
