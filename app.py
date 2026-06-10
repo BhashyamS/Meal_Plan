@@ -563,6 +563,78 @@ def read_grocery_input():
 
     return df
 
+def enrich_grocery_for_shopping(grocery_df):
+    """
+    Adds client-friendly shopping columns.
+    Uses Food_Coach_Input notes if present:
+    - suggested_buy: product name / what exactly to buy
+    - where_to_buy: Costco, Sprouts, Starbucks, etc.
+    If those columns are later added directly to the sheet, the app will use them.
+    """
+    df = grocery_df.copy()
+
+    if "suggested_buy" not in df.columns:
+        df["suggested_buy"] = ""
+    if "where_to_buy" not in df.columns:
+        df["where_to_buy"] = ""
+
+    def guess_suggested_buy(row):
+        explicit = str(row.get("suggested_buy", "")).strip()
+        if explicit:
+            return explicit
+
+        item = str(row.get("item", "")).strip()
+        notes = str(row.get("notes", "")).strip()
+
+        # If notes has a product-style phrase, use it lightly.
+        if "Costco tub" in notes and "Whey" in item:
+            return "Optimum Nutrition Vanilla Whey Protein"
+        if item.lower() == "whey protein":
+            return "Optimum Nutrition Vanilla Whey Protein"
+        if item.lower() == "coffee":
+            return "Cold brew or coffee concentrate"
+        if item.lower() == "whole milk":
+            return "Kirkland / Sprouts whole milk"
+        if "bagel" in item.lower():
+            return "Whole wheat bagels"
+        if "greek yogurt" in item.lower():
+            return "Greek yogurt cups or tub"
+        if item.lower() == "trail mix":
+            return "Trail mix bag"
+        if item.lower() == "rotisserie chicken portion":
+            return "Costco rotisserie chicken"
+        if item.lower() == "tuna packet":
+            return "Low-sodium tuna packets"
+        if item.lower() == "shrimp cocktail":
+            return "Costco or Sprouts shrimp cocktail"
+        if item.lower() == "yasso greek yogurt bar":
+            return "Yasso Greek yogurt bars"
+        return item
+
+    def guess_where(row):
+        explicit = str(row.get("where_to_buy", "")).strip()
+        if explicit:
+            return explicit
+
+        item = str(row.get("item", "")).strip().lower()
+        notes = str(row.get("notes", "")).strip().lower()
+        storage = str(row.get("storage", "")).strip().lower()
+
+        if "costco" in notes or "kirkland" in notes or item in ["whey protein", "rotisserie chicken portion", "shrimp cocktail", "costco salad"]:
+            return "Costco"
+        if item in ["apple", "orange", "side salad", "baby carrots", "whole wheat bagel"]:
+            return "Sprouts"
+        if "starbucks" in item:
+            return "Starbucks"
+        if "buy fresh" in storage:
+            return "Restaurant / fresh"
+        return "Costco or Sprouts"
+
+    df["Suggested Buy"] = df.apply(guess_suggested_buy, axis=1)
+    df["Where to Buy"] = df.apply(guess_where, axis=1)
+
+    return df
+
 def read_daily_logs():
     df = read_sheet("Daily_Logs", daily_headers())
     for col in ["calories", "protein", "carbs", "fat", "cost"]:
@@ -1396,6 +1468,8 @@ elif page == "🛒 Grocery + Shopping":
                 "low_stock_at": "Low Stock At",
             })
 
+            base = enrich_grocery_for_shopping(base)
+
             base["Buy"] = False
             base["Suggested Qty"] = pd.to_numeric(base["Suggested Qty"], errors="coerce").fillna(0)
             base["Default Price"] = pd.to_numeric(base["Default Price"], errors="coerce").fillna(0)
@@ -1406,7 +1480,7 @@ elif page == "🛒 Grocery + Shopping":
             )
             base["Total Cost"] = base["Qty Bought"] * base["Unit Price"]
 
-            compact_cols = ["Buy", "Item", "Qty Bought", "Unit", "Unit Price", "Total Cost"]
+            compact_cols = ["Buy", "Item", "Suggested Buy", "Where to Buy", "Qty Bought", "Unit Price", "Total Cost"]
 
             def shopping_editor(section_label, df_section, key_suffix):
                 st.markdown(f"### {section_label}")
@@ -1423,21 +1497,22 @@ elif page == "🛒 Grocery + Shopping":
                     key=f"shopping_editor_{key_suffix}",
                     column_config={
                         "Buy": st.column_config.CheckboxColumn("Buy", width="small"),
-                        "Item": st.column_config.TextColumn("Item", width="medium"),
+                        "Item": st.column_config.TextColumn("Item", width="small"),
+                        "Suggested Buy": st.column_config.TextColumn("Suggested Buy", width="large"),
+                        "Where to Buy": st.column_config.TextColumn("Where", width="small"),
                         "Qty Bought": st.column_config.NumberColumn("Qty", min_value=0.0, step=1.0, width="small"),
-                        "Unit": st.column_config.TextColumn("Unit", width="small"),
                         "Unit Price": st.column_config.NumberColumn("Price", min_value=0.0, step=0.25, format="$%.2f", width="small"),
                         "Total Cost": st.column_config.NumberColumn("Total", min_value=0.0, step=0.25, format="$%.2f", width="small"),
                     },
-                    disabled=["Item", "Unit", "Total Cost"],
+                    disabled=["Item", "Suggested Buy", "Where to Buy", "Total Cost"],
                 )
 
                 edited_section["Qty Bought"] = pd.to_numeric(edited_section["Qty Bought"], errors="coerce").fillna(0)
                 edited_section["Unit Price"] = pd.to_numeric(edited_section["Unit Price"], errors="coerce").fillna(0)
                 edited_section["Total Cost"] = (edited_section["Qty Bought"] * edited_section["Unit Price"]).round(2)
 
-                # Reattach hidden columns.
-                hidden = df_section[["Item", "Category", "Storage", "Low Stock At", "Suggested Qty"]].copy()
+                # Reattach hidden columns needed for inventory.
+                hidden = df_section[["Item", "Category", "Unit", "Storage", "Low Stock At", "Suggested Qty"]].copy()
                 merged = edited_section.merge(hidden, on="Item", how="left")
                 return merged
 
@@ -1465,7 +1540,7 @@ elif page == "🛒 Grocery + Shopping":
             st.metric("Shopping Total", f"${total:.2f}")
             if not selected.empty:
                 st.caption("Selected items only:")
-                st.dataframe(selected[["Item", "Qty Bought", "Unit", "Unit Price", "Total Cost"]], use_container_width=True, hide_index=True)
+                st.dataframe(selected[["Item", "Suggested Buy", "Where to Buy", "Qty Bought", "Unit Price", "Total Cost"]], use_container_width=True, hide_index=True)
 
             st.markdown("### Add One-Off Shopping Item")
             with st.expander("➕ Add to this shopping trip only", expanded=False):
