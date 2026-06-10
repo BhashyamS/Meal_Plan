@@ -536,7 +536,7 @@ def food_options_headers():
     ]
 
 def grocery_headers():
-    return ["item", "category", "suggested_qty", "unit", "default_price", "storage", "low_stock_at", "notes"]
+    return ["item", "category", "suggested_qty", "unit", "default_price", "storage", "low_stock_at", "suggested_buy", "where_to_buy", "notes"]
 
 def daily_headers():
     return [
@@ -605,16 +605,20 @@ def read_grocery_input():
     df["category"] = df["category"].astype(str).str.strip()
     df["unit"] = df["unit"].astype(str).str.strip()
     df["storage"] = df["storage"].astype(str).str.strip()
+    df["suggested_buy"] = df["suggested_buy"].astype(str).str.strip()
+    df["where_to_buy"] = df["where_to_buy"].astype(str).str.strip()
+    df["notes"] = df["notes"].astype(str).str.strip()
 
     return df
 
 def enrich_grocery_for_shopping(grocery_df):
     """
     Adds client-friendly shopping columns.
-    Uses Food_Coach_Input notes if present:
-    - suggested_buy: product name / what exactly to buy
-    - where_to_buy: Costco, Sprouts, Starbucks, etc.
-    If those columns are later added directly to the sheet, the app will use them.
+    Source of truth:
+    - suggested_buy from Food_Coach_Input
+    - where_to_buy from Food_Coach_Input
+
+    If those cells are blank, the app uses a light fallback so the card is not empty.
     """
     df = grocery_df.copy()
 
@@ -623,84 +627,69 @@ def enrich_grocery_for_shopping(grocery_df):
     if "where_to_buy" not in df.columns:
         df["where_to_buy"] = ""
 
-    def guess_suggested_buy(row):
-        explicit = str(row.get("suggested_buy", "")).strip()
-        if explicit:
-            return explicit
+    def clean_text(value):
+        value = str(value).strip()
+        if value.lower() in ["nan", "none"]:
+            return ""
+        return value
 
-        item = str(row.get("item", "")).strip()
-        notes = str(row.get("notes", "")).strip()
+    def fallback_suggested_buy(item):
+        item_l = str(item).strip().lower()
+        defaults = {
+            "whey protein": "Optimum Nutrition Gold Standard Whey - Vanilla",
+            "coffee": "Cold brew or coffee concentrate",
+            "whole milk": "Whole milk",
+            "pb whole wheat bagel": "Whole wheat bagels + peanut butter",
+            "greek yogurt + granola": "Greek yogurt tub/cups + low-sugar granola",
+            "greek yogurt banana granola": "Greek yogurt + bananas + granola",
+            "overnight oats": "Overnight oats cups",
+            "starbucks protein box": "Starbucks Eggs & Cheese Protein Box",
+            "4 boiled eggs + bagel": "Pre-boiled eggs + whole wheat bagels",
+            "banana": "Bananas",
+            "apple": "Apples",
+            "orange": "Oranges",
+            "side salad": "Salad kit or salad mix",
+            "baby carrots": "Baby carrots bag",
+            "boiled eggs": "Pre-boiled eggs",
+            "greek yogurt cup": "Greek yogurt cups",
+            "trail mix": "Trail mix bag",
+            "yasso greek yogurt bar": "Yasso Greek yogurt bars",
+            "protein bar": "Protein bar box",
+            "rice cup": "Microwave rice cups",
+            "whole wheat bagel": "Whole wheat bagels",
+            "rotisserie chicken portion": "Costco rotisserie chicken",
+            "tuna packet": "Low-sodium tuna packets",
+            "shrimp cocktail": "Shrimp cocktail",
+            "chicken breast": "Pre-cooked chicken breast pack",
+            "costco salad": "Costco salad kit",
+            "chips": "Single-serve chips",
+            "water": "Water",
+            "sprite": "Sprite",
+            "coke zero": "Coke Zero",
+        }
+        return defaults.get(item_l, str(item).strip())
 
-        # If notes has a product-style phrase, use it lightly.
-        if "Costco tub" in notes and "Whey" in item:
-            return "Optimum Nutrition Vanilla Whey Protein"
-        if item.lower() == "whey protein":
-            return "Optimum Nutrition Vanilla Whey Protein"
-        if item.lower() == "coffee":
-            return "Cold brew or coffee concentrate"
-        if item.lower() == "whole milk":
-            return "Kirkland / Sprouts whole milk"
-        if "bagel" in item.lower():
-            return "Whole wheat bagels"
-        if "greek yogurt" in item.lower():
-            return "Greek yogurt cups or tub"
-        if item.lower() == "trail mix":
-            return "Trail mix bag"
-        if item.lower() == "rotisserie chicken portion":
-            return "Costco rotisserie chicken"
-        if item.lower() == "tuna packet":
-            return "Low-sodium tuna packets"
-        if item.lower() == "shrimp cocktail":
-            return "Costco or Sprouts shrimp cocktail"
-        if item.lower() == "yasso greek yogurt bar":
-            return "Yasso Greek yogurt bars"
-        return item
-
-    def guess_where(row):
-        explicit = str(row.get("where_to_buy", "")).strip()
-        if explicit:
-            return explicit
-
-        item = str(row.get("item", "")).strip().lower()
-        notes = str(row.get("notes", "")).strip().lower()
-        storage = str(row.get("storage", "")).strip().lower()
-
-        if "costco" in notes or "kirkland" in notes or item in ["whey protein", "rotisserie chicken portion", "shrimp cocktail", "costco salad"]:
+    def fallback_where(item, category):
+        item_l = str(item).strip().lower()
+        if item_l in ["whey protein", "rotisserie chicken portion", "shrimp cocktail", "costco salad"]:
             return "Costco"
-        if item in ["apple", "orange", "side salad", "baby carrots", "whole wheat bagel"]:
+        if item_l in ["apple", "orange", "side salad", "baby carrots", "banana"]:
             return "Sprouts"
-        if "starbucks" in item:
+        if "starbucks" in item_l:
             return "Starbucks"
-        if "buy fresh" in storage:
-            return "Restaurant / fresh"
-        return "Costco or Sprouts"
+        if category and str(category).strip().lower() == "as needed":
+            return "User choice"
+        return "User choice"
 
-    df["Suggested Buy"] = df.apply(guess_suggested_buy, axis=1)
-    df["Where to Buy"] = df.apply(guess_where, axis=1)
+    df["Suggested Buy"] = df.apply(
+        lambda r: clean_text(r.get("suggested_buy", "")) or fallback_suggested_buy(r.get("item", "")),
+        axis=1
+    )
+    df["Where to Buy"] = df.apply(
+        lambda r: clean_text(r.get("where_to_buy", "")) or fallback_where(r.get("item", ""), r.get("category", "")),
+        axis=1
+    )
 
-    return df
-
-def read_daily_logs():
-    df = read_sheet("Daily_Logs", daily_headers())
-    for col in ["calories", "protein", "carbs", "fat", "cost"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-    return df
-
-def read_shopping_trips():
-    df = read_sheet("Shopping_Trips", shopping_headers())
-    for col in ["qty_bought", "unit_price", "total_cost"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-    return df
-
-def read_inventory():
-    df = read_sheet("Inventory", inventory_headers())
-    for col in ["qty_on_hand", "last_unit_price", "low_stock_at"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-    return df
-
-def read_budget_logs():
-    df = read_sheet("Budget_Log", budget_headers())
-    df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
     return df
 
 
@@ -1587,6 +1576,9 @@ if page == "🛒 Grocery + Shopping":
                 "default_price": "Default Price",
                 "storage": "Storage",
                 "low_stock_at": "Low Stock At",
+                "suggested_buy": "suggested_buy",
+                "where_to_buy": "where_to_buy",
+                "notes": "notes",
             })
 
             base = enrich_grocery_for_shopping(base)
@@ -1602,16 +1594,30 @@ if page == "🛒 Grocery + Shopping":
                 st.session_state.shopping_category_filter_buttons = []
 
             st.caption("Stores")
-            store_cols = st.columns(3)
-            with store_cols[0]:
-                if st.button("🏪 Costco", key="filter_costco", use_container_width=True):
-                    stores = st.session_state.shopping_store_filter_buttons
-                    st.session_state.shopping_store_filter_buttons = [s for s in stores if s != "Costco"] if "Costco" in stores else stores + ["Costco"]
-            with store_cols[1]:
-                if st.button("🥬 Sprouts", key="filter_sprouts", use_container_width=True):
-                    stores = st.session_state.shopping_store_filter_buttons
-                    st.session_state.shopping_store_filter_buttons = [s for s in stores if s != "Sprouts"] if "Sprouts" in stores else stores + ["Sprouts"]
-            with store_cols[2]:
+            detected_stores = []
+            if "Where to Buy" in base.columns:
+                for store_text in base["Where to Buy"].dropna().astype(str).tolist():
+                    for piece in store_text.replace("/", ",").replace(" or ", ",").split(","):
+                        piece = piece.strip()
+                        if piece and piece.lower() not in ["user choice", "nan", "none"]:
+                            detected_stores.append(piece)
+
+            preferred_stores = ["Costco", "Sprouts", "Starbucks", "Restaurant"]
+            store_buttons = []
+            for s in preferred_stores + sorted(set(detected_stores)):
+                if s not in store_buttons:
+                    store_buttons.append(s)
+
+            store_cols = st.columns(min(4, max(1, len(store_buttons) + 1)))
+            for i, store_name in enumerate(store_buttons):
+                with store_cols[i % len(store_cols)]:
+                    label = f"✅ {store_name}" if store_name in st.session_state.shopping_store_filter_buttons else store_name
+                    if st.button(label, key=f"filter_store_{store_name}", use_container_width=True):
+                        stores = st.session_state.shopping_store_filter_buttons
+                        st.session_state.shopping_store_filter_buttons = [s for s in stores if s != store_name] if store_name in stores else stores + [store_name]
+
+            clear_cols = st.columns([1, 3])
+            with clear_cols[0]:
                 if st.button("🧹 Clear Stores", key="clear_store_filters", use_container_width=True):
                     st.session_state.shopping_store_filter_buttons = []
 
