@@ -21,89 +21,58 @@ st.set_page_config(
     layout="wide"
 )
 
+
 # =========================================================
-# MOBILE-FRIENDLY CSS
+# THEME-AWARE CSS
 # =========================================================
 st.markdown("""
 <style>
     :root {
-        --app-bg: #ffffff;
         --app-text: #1f2933;
         --app-muted: #5f6b7a;
-
         --honey: #C47F00;
         --honey-bright: #B96B00;
         --honey-soft: #FFF4CC;
         --honey-border: #E8B64B;
-
         --bear: #5C3B1E;
         --bear-soft: #FFF7E6;
-
         --card-bg: #ffffff;
         --card-border: #E5E7EB;
-        --dark-card-bg: #ffffff;
-
         --kpi-bg: #ffffff;
         --kpi-border: #D6DCE5;
         --kpi-text: #1f2933;
-
         --success-bg: #EAF7EF;
         --success-border: #6BCB88;
         --success-text: #14532D;
-
-        --warning-bg: #FFF7E6;
-        --warning-border: #E8B64B;
-        --warning-text: #5C3B1E;
-
         --button-bg: #FFF7E6;
         --button-text: #5C3B1E;
         --button-hover: #FFE8A3;
-
         --shadow: rgba(15, 23, 42, 0.10);
     }
-
     @media (prefers-color-scheme: dark) {
         :root {
-            --app-bg: #0E1117;
             --app-text: #F8FAFC;
             --app-muted: #B8C0CC;
-
             --honey: #FFD95A;
             --honey-bright: #F4C542;
             --honey-soft: #2B1A0B;
             --honey-border: #F4C542;
-
             --bear: #FFD95A;
             --bear-soft: #21170C;
-
             --card-bg: #16191f;
             --card-border: #30343d;
-            --dark-card-bg: #11151c;
-
             --kpi-bg: #11151c;
             --kpi-border: #30343d;
             --kpi-text: #F8FAFC;
-
             --success-bg: #102318;
             --success-border: #245c35;
             --success-text: #D1FAE5;
-
-            --warning-bg: #3a2411;
-            --warning-border: #cc8a22;
-            --warning-text: #FFF7E6;
-
             --button-bg: #17120A;
             --button-text: #FFD95A;
             --button-hover: #2B1A0B;
-
             --shadow: rgba(0, 0, 0, 0.25);
         }
     }
-
-    .stApp {
-        color: var(--app-text);
-    }
-
     .hero-wrap {
         text-align: center;
         background:
@@ -111,26 +80,22 @@ st.markdown("""
             linear-gradient(135deg, var(--honey-soft), var(--card-bg));
         border: 1px solid var(--honey-border);
         border-radius: 28px;
-        padding: 28px 18px;
-        margin-bottom: 22px;
+        padding: 26px 18px;
+        margin-bottom: 18px;
         box-shadow: 0 0 25px var(--shadow);
     }
-
     .hero-title {
-        font-size: 44px;
+        font-size: 42px;
         font-weight: 950;
         color: var(--honey);
         margin-bottom: 6px;
         line-height: 1.05;
         text-shadow: 0 2px 0 rgba(92,59,30,0.35);
     }
-
     .hero-subtitle {
-        font-size: 17px;
+        font-size: 16px;
         color: var(--app-text);
-        margin-bottom: 0px;
     }
-
     .honey-pill {
         display: inline-block;
         background: var(--honey);
@@ -141,7 +106,6 @@ st.markdown("""
         margin-bottom: 10px;
         font-size: 14px;
     }
-
     .section-card {
         background: linear-gradient(135deg, var(--bear-soft), var(--card-bg));
         color: var(--app-text);
@@ -153,67 +117,7 @@ st.markdown("""
         font-size: 15px;
         line-height: 1.6;
     }
-
-    .section-card h3 {
-        color: var(--bear);
-        margin-top: 0;
-        margin-bottom: 8px;
-    }
-
-    .dark-card,
-    .component-block {
-        background: var(--card-bg);
-        color: var(--app-text);
-        border: 1px solid var(--card-border);
-        border-radius: 16px;
-        padding: 14px;
-        margin-bottom: 14px;
-        box-shadow: 0 2px 8px var(--shadow);
-    }
-
-    .meal-total,
-    .grocery-cost-note {
-        background: var(--success-bg);
-        color: var(--success-text);
-        border: 1px solid var(--success-border);
-        padding: 12px;
-        border-radius: 12px;
-        margin-top: 8px;
-        margin-bottom: 14px;
-    }
-
-    .warning-card {
-        background: var(--warning-bg);
-        color: var(--warning-text);
-        border: 1px solid var(--warning-border);
-        padding: 14px;
-        border-radius: 14px;
-        margin-bottom: 12px;
-    }
-
-    .kpi-card {
-        background: var(--kpi-bg);
-        color: var(--kpi-text);
-        border: 1px solid var(--kpi-border);
-        border-radius: 16px;
-        padding: 14px;
-        margin-top: 10px;
-        margin-bottom: 10px;
-    }
-
-    .kpi-card b {
-        color: var(--honey);
-    }
-
-    .component-full-name {
-        color: var(--app-text);
-        font-weight: 800;
-        font-size: 15px;
-        margin: 6px 0 8px 0;
-        word-break: break-word;
-        overflow-wrap: anywhere;
-    }
-
+    .section-card h3 { color: var(--bear); margin-top: 0; margin-bottom: 8px; }
     div[data-testid="stMetric"] {
         background: var(--kpi-bg);
         color: var(--kpi-text);
@@ -222,12 +126,7 @@ st.markdown("""
         border-radius: 14px;
         box-shadow: 0 2px 8px var(--shadow);
     }
-
-    div[data-testid="stMetric"] label,
-    div[data-testid="stMetric"] div {
-        color: var(--kpi-text) !important;
-    }
-
+    div[data-testid="stMetric"] label, div[data-testid="stMetric"] div { color: var(--kpi-text) !important; }
     div.stButton > button {
         width: 100%;
         border-radius: 999px;
@@ -237,41 +136,11 @@ st.markdown("""
         font-weight: 800;
         padding: 0.7rem 1rem;
     }
-
     div.stButton > button:hover {
         border-color: var(--honey);
         background: var(--button-hover);
         color: var(--button-text);
     }
-
-    .footer-honey {
-        text-align: center;
-        color: var(--honey);
-        font-weight: 800;
-        padding: 18px;
-        margin-top: 28px;
-    }
-
-    /* Dataframes / editors */
-    [data-testid="stDataFrame"],
-    [data-testid="stDataEditor"] {
-        border-radius: 14px;
-        overflow: hidden;
-    }
-
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 30px;
-        }
-        .hero-subtitle {
-            font-size: 14px;
-        }
-        div[data-testid="column"] {
-            width: 100% !important;
-            flex: 1 1 100% !important;
-        }
-    }
-
     .compact-kpi {
         background: var(--kpi-bg);
         color: var(--kpi-text);
@@ -279,14 +148,8 @@ st.markdown("""
         border-radius: 14px;
         padding: 10px 12px;
         margin-top: 8px;
-        min-height: 112px;
+        min-height: 96px;
     }
-
-    .compact-kpi b {
-        color: var(--honey);
-        font-size: 14px;
-    }
-
     .compact-name {
         color: var(--app-text);
         font-weight: 750;
@@ -296,22 +159,36 @@ st.markdown("""
         white-space: normal;
         overflow-wrap: anywhere;
     }
-
-    .compact-macro {
-        font-size: 13px;
-        line-height: 1.45;
+    .meal-total, .cost-box {
+        background: var(--success-bg);
+        color: var(--success-text);
+        border: 1px solid var(--success-border);
+        padding: 12px;
+        border-radius: 12px;
+        margin-top: 10px;
+        margin-bottom: 14px;
     }
-
+    .footer-honey {
+        text-align: center;
+        color: var(--honey);
+        font-weight: 800;
+        padding: 18px;
+        margin-top: 28px;
+    }
+    @media (max-width: 768px) {
+        .hero-title { font-size: 30px; }
+        .hero-subtitle { font-size: 14px; }
+        div[data-testid="column"] { width: 100% !important; flex: 1 1 100% !important; }
+    }
 </style>
 """, unsafe_allow_html=True)
 
 
 # =========================================================
-# CLIENT + TARGETS
+# CLIENT TARGETS
 # =========================================================
 CLIENT = {
     "name": "Pooh Bear",
-    "prepared_by": "Srija Bhashyam",
     "goal": "Lean Bulk",
     "age": 27,
     "height": "6'0",
@@ -319,156 +196,12 @@ CLIENT = {
     "calorie_target": "3,600–4,000/day",
     "protein_target": "180–220g/day",
     "weekly_budget": 150,
-    "daily_budget": 150 / 7,
     "lifestyle": "Driving job, mini fridge only, no kitchen, low-prep meals",
-    "focus": "High protein, budget-conscious, lower sugar, lower sodium where possible"
 }
 
 
 # =========================================================
-# FOOD COMPONENTS
-# =========================================================
-COMPONENTS = {
-    "Drink": [
-        {"name": "None", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0, "ingredients": {}},
-        {"name": "Protein iced coffee", "calories": 380, "protein": 54, "carbs": 24, "fat": 10, "cost": 2.00,
-         "ingredients": {"Whey protein": 2, "Whole milk": 16, "Cold coffee": 1}},
-        {"name": "Regular cold coffee", "calories": 40, "protein": 1, "carbs": 8, "fat": 1, "cost": 0.50,
-         "ingredients": {"Cold coffee": 1}},
-        {"name": "Whole milk", "calories": 150, "protein": 8, "carbs": 12, "fat": 8, "cost": 0.75,
-         "ingredients": {"Whole milk": 8}},
-        {"name": "Water", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0,
-         "ingredients": {}},
-    ],
-    "Main": [
-        {"name": "None", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0, "ingredients": {}},
-        {"name": "Peanut butter bagel", "calories": 470, "protein": 18, "carbs": 58, "fat": 19, "cost": 1.25,
-         "ingredients": {"Bagel": 1, "Peanut butter": 2}},
-        {"name": "Greek yogurt + granola bowl", "calories": 350, "protein": 20, "carbs": 45, "fat": 8, "cost": 2.00,
-         "ingredients": {"Greek yogurt": 1, "Granola": 1}},
-        {"name": "Subway Footlong Turkey", "calories": 850, "protein": 60, "carbs": 95, "fat": 22, "cost": 12.00,
-         "ingredients": {"Subway Footlong Turkey": 1}},
-        {"name": "Subway Footlong Rotisserie Chicken", "calories": 900, "protein": 65, "carbs": 95, "fat": 25, "cost": 13.00,
-         "ingredients": {"Subway Footlong Rotisserie Chicken": 1}},
-        {"name": "Grocery store deli sandwich", "calories": 700, "protein": 35, "carbs": 75, "fat": 25, "cost": 7.00,
-         "ingredients": {"Grocery store deli sandwich": 1}},
-        {"name": "Vitality Bowl protein wrap", "calories": 700, "protein": 30, "carbs": 75, "fat": 24, "cost": 15.00,
-         "ingredients": {"Vitality Bowl protein wrap": 1}},
-        {"name": "Jersey Mike's Giant Turkey Sub", "calories": 1100, "protein": 70, "carbs": 120, "fat": 38, "cost": 15.00,
-         "ingredients": {"Jersey Mike's Giant Turkey Sub": 1}},
-        {"name": "Rotisserie chicken portion", "calories": 550, "protein": 65, "carbs": 0, "fat": 30, "cost": 2.50,
-         "ingredients": {"Rotisserie chicken portion": 1}},
-    ],
-    "Side": [
-        {"name": "None", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0, "ingredients": {}},
-        {"name": "Banana", "calories": 120, "protein": 1, "carbs": 31, "fat": 0, "cost": 0.35,
-         "ingredients": {"Banana": 1}},
-        {"name": "2 boiled eggs", "calories": 140, "protein": 12, "carbs": 1, "fat": 10, "cost": 1.10,
-         "ingredients": {"Boiled eggs": 2}},
-        {"name": "Protein bar", "calories": 200, "protein": 20, "carbs": 22, "fat": 6, "cost": 1.25,
-         "ingredients": {"Protein bar": 1}},
-        {"name": "Trail mix", "calories": 380, "protein": 9, "carbs": 35, "fat": 24, "cost": 1.15,
-         "ingredients": {"Trail mix": 1}},
-        {"name": "Rice cup", "calories": 220, "protein": 4, "carbs": 46, "fat": 2, "cost": 1.25,
-         "ingredients": {"Rice cup": 1}},
-        {"name": "Whole wheat bagel", "calories": 250, "protein": 10, "carbs": 48, "fat": 2, "cost": 0.75,
-         "ingredients": {"Whole wheat bagel": 1}},
-        {"name": "Whole wheat bread serving", "calories": 240, "protein": 8, "carbs": 44, "fat": 4, "cost": 0.75,
-         "ingredients": {"Whole wheat bread serving": 1}},
-    ],
-    "Dessert/Treat": [
-        {"name": "None", "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0, "ingredients": {}},
-        {"name": "Greek yogurt", "calories": 150, "protein": 18, "carbs": 12, "fat": 3, "cost": 1.25,
-         "ingredients": {"Greek yogurt": 1}},
-        {"name": "Granola serving", "calories": 200, "protein": 4, "carbs": 35, "fat": 5, "cost": 0.75,
-         "ingredients": {"Granola": 1}},
-        {"name": "Protein bar", "calories": 200, "protein": 20, "carbs": 22, "fat": 6, "cost": 1.25,
-         "ingredients": {"Protein bar": 1}},
-        {"name": "Banana", "calories": 120, "protein": 1, "carbs": 31, "fat": 0, "cost": 0.35,
-         "ingredients": {"Banana": 1}},
-    ],
-}
-
-MEAL_SLOTS = ["Breakfast", "Lunch", "Snack", "Dinner"]
-COMPONENT_SLOTS = ["Drink", "Main", "Side", "Dessert/Treat"]
-
-DEFAULT_DAY_PLAN = {
-    "Breakfast": {"Drink": "Protein iced coffee", "Main": "Peanut butter bagel", "Side": "2 boiled eggs", "Dessert/Treat": "Banana"},
-    "Lunch": {"Drink": "Water", "Main": "Subway Footlong Turkey", "Side": "Protein bar", "Dessert/Treat": "None"},
-    "Snack": {"Drink": "Water", "Main": "Greek yogurt + granola bowl", "Side": "Trail mix", "Dessert/Treat": "None"},
-    "Dinner": {"Drink": "Water", "Main": "Rotisserie chicken portion", "Side": "Whole wheat bagel", "Dessert/Treat": "Greek yogurt"},
-}
-
-# Meal-specific dropdown rules.
-# This prevents breakfast from showing lunch/dinner foods and keeps the app cleaner for the client.
-MEAL_ALLOWED_OPTIONS = {
-    "Breakfast": {
-        "Drink": ["None", "Protein iced coffee", "Regular cold coffee", "Whole milk", "Water"],
-        "Main": ["None", "Peanut butter bagel", "Greek yogurt + granola bowl"],
-        "Side": ["None", "Banana", "2 boiled eggs", "Protein bar"],
-        "Dessert/Treat": ["None", "Greek yogurt", "Granola serving", "Protein bar", "Banana"],
-    },
-    "Lunch": {
-        "Drink": ["None", "Water", "Regular cold coffee"],
-        "Main": [
-            "None",
-            "Subway Footlong Turkey",
-            "Subway Footlong Rotisserie Chicken",
-            "Grocery store deli sandwich",
-            "Vitality Bowl protein wrap",
-            "Jersey Mike's Giant Turkey Sub",
-        ],
-        "Side": ["None", "Protein bar", "Banana", "Trail mix"],
-        "Dessert/Treat": ["None", "Greek yogurt", "Protein bar", "Banana"],
-    },
-    "Snack": {
-        "Drink": ["None", "Water", "Whole milk", "Regular cold coffee"],
-        "Main": ["None", "Greek yogurt + granola bowl", "Peanut butter bagel"],
-        "Side": ["None", "Trail mix", "Banana", "Protein bar", "2 boiled eggs"],
-        "Dessert/Treat": ["None", "Greek yogurt", "Granola serving", "Protein bar", "Banana"],
-    },
-    "Dinner": {
-        "Drink": ["None", "Water", "Whole milk"],
-        "Main": ["None", "Rotisserie chicken portion", "Grocery store deli sandwich", "Vitality Bowl protein wrap"],
-        "Side": ["None", "Whole wheat bagel", "Rice cup", "Whole wheat bread serving", "2 boiled eggs"],
-        "Dessert/Treat": ["None", "Greek yogurt", "Protein bar", "Banana"],
-    },
-}
-
-GENERAL_MONTHLY = [
-    {"Item": "Whey protein", "Category": "Monthly", "Suggested Qty": 1, "Unit": "tub", "Default Price": 60.00, "Storage": "Room temp", "Low Stock At": 10},
-    {"Item": "Peanut butter", "Category": "Monthly", "Suggested Qty": 1, "Unit": "large jar", "Default Price": 10.00, "Storage": "Room temp", "Low Stock At": 4},
-    {"Item": "Trail mix", "Category": "Monthly", "Suggested Qty": 1, "Unit": "bag", "Default Price": 15.00, "Storage": "Room temp", "Low Stock At": 3},
-    {"Item": "Protein bar", "Category": "Monthly", "Suggested Qty": 12, "Unit": "bars", "Default Price": 20.00, "Storage": "Room temp", "Low Stock At": 3},
-    {"Item": "Granola", "Category": "Monthly", "Suggested Qty": 1, "Unit": "bag", "Default Price": 8.00, "Storage": "Room temp", "Low Stock At": 3},
-]
-
-GENERAL_WEEKLY = [
-    {"Item": "Whole milk", "Category": "Weekly", "Suggested Qty": 128, "Unit": "oz", "Default Price": 8.00, "Storage": "Mini fridge", "Low Stock At": 32},
-    {"Item": "Bagel", "Category": "Weekly", "Suggested Qty": 12, "Unit": "bagels", "Default Price": 8.00, "Storage": "Room temp", "Low Stock At": 3},
-    {"Item": "Whole wheat bagel", "Category": "Weekly", "Suggested Qty": 6, "Unit": "bagels", "Default Price": 5.00, "Storage": "Room temp", "Low Stock At": 2},
-    {"Item": "Banana", "Category": "Weekly", "Suggested Qty": 14, "Unit": "bananas", "Default Price": 4.00, "Storage": "Room temp", "Low Stock At": 3},
-    {"Item": "Greek yogurt", "Category": "Weekly", "Suggested Qty": 8, "Unit": "servings", "Default Price": 8.00, "Storage": "Mini fridge", "Low Stock At": 2},
-    {"Item": "Boiled eggs", "Category": "Weekly", "Suggested Qty": 12, "Unit": "eggs", "Default Price": 7.00, "Storage": "Mini fridge", "Low Stock At": 2},
-    {"Item": "Rotisserie chicken portion", "Category": "Weekly", "Suggested Qty": 6, "Unit": "portions", "Default Price": 10.00, "Storage": "Mini fridge", "Low Stock At": 1},
-    {"Item": "Rice cup", "Category": "Weekly", "Suggested Qty": 4, "Unit": "cups", "Default Price": 5.00, "Storage": "Room temp", "Low Stock At": 1},
-    {"Item": "Whole wheat bread serving", "Category": "Weekly", "Suggested Qty": 6, "Unit": "servings", "Default Price": 5.00, "Storage": "Room temp", "Low Stock At": 2},
-    {"Item": "Cold coffee", "Category": "Weekly", "Suggested Qty": 7, "Unit": "servings", "Default Price": 5.00, "Storage": "Room temp/fridge", "Low Stock At": 2},
-]
-
-RESTAURANT_ITEMS = [
-    {"Item": "Subway Footlong Turkey", "Category": "Restaurant", "Suggested Qty": 1, "Unit": "meal", "Default Price": 12.00, "Storage": "Buy fresh", "Low Stock At": 0},
-    {"Item": "Subway Footlong Rotisserie Chicken", "Category": "Restaurant", "Suggested Qty": 1, "Unit": "meal", "Default Price": 13.00, "Storage": "Buy fresh", "Low Stock At": 0},
-    {"Item": "Grocery store deli sandwich", "Category": "Restaurant", "Suggested Qty": 1, "Unit": "meal", "Default Price": 7.00, "Storage": "Buy fresh", "Low Stock At": 0},
-    {"Item": "Vitality Bowl protein wrap", "Category": "Restaurant", "Suggested Qty": 1, "Unit": "meal", "Default Price": 15.00, "Storage": "Buy fresh", "Low Stock At": 0},
-    {"Item": "Jersey Mike's Giant Turkey Sub", "Category": "Restaurant", "Suggested Qty": 1, "Unit": "meal", "Default Price": 15.00, "Storage": "Buy fresh", "Low Stock At": 0},
-]
-
-GENERAL_GROCERY = GENERAL_MONTHLY + GENERAL_WEEKLY
-
-
-# =========================================================
-# GOOGLE SHEETS HELPERS
+# GOOGLE SHEETS
 # =========================================================
 SCOPE = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
 
@@ -493,36 +226,21 @@ def get_spreadsheet():
         return client.create(name)
 
 def get_or_create_worksheet(spreadsheet, title, headers):
-    """
-    Safely gets or creates a worksheet.
-    Uses a small starting size to avoid Google Sheets API/cell limit issues.
-    """
     try:
-        worksheet = spreadsheet.worksheet(title)
+        ws = spreadsheet.worksheet(title)
     except Exception:
         try:
-            worksheet = spreadsheet.add_worksheet(
-                title=title,
-                rows=100,
-                cols=max(12, len(headers))
-            )
-            worksheet.append_row(headers)
-            return worksheet
-        except Exception as e:
-            st.error(f"Could not create the Google Sheet tab: {title}")
-            st.caption(str(e))
+            ws = spreadsheet.add_worksheet(title=title, rows=50, cols=max(8, len(headers)))
+            ws.update("A1", [headers])
+            return ws
+        except Exception:
             return None
-
-    # Try to make sure the header row exists without crashing the app
     try:
-        first_row = worksheet.row_values(1)
-        if not first_row:
-            worksheet.append_row(headers)
-    except Exception as e:
-        st.warning(f"Could not verify headers for tab: {title}")
-        st.caption(str(e))
-
-    return worksheet
+        if not ws.row_values(1):
+            ws.update("A1", [headers])
+    except Exception:
+        pass
+    return ws
 
 def clean_df_for_sheets(df, headers):
     if df.empty:
@@ -545,77 +263,80 @@ def clean_df_for_sheets(df, headers):
         rows.append(clean)
     return rows
 
-def rewrite_sheet(title, headers, df):
-    spreadsheet = get_spreadsheet()
-    if spreadsheet is None:
-        return False, "Google Sheets is not connected."
-
-    worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    if worksheet is None:
-        return False, f"Could not access tab: {title}"
-
-    try:
-        worksheet.clear()
-        worksheet.append_row(headers)
-        rows = clean_df_for_sheets(df, headers)
-        if rows:
-            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-        return True, f"{title} updated."
-    except Exception as e:
-        st.error(f"Could not write to tab: {title}")
-        st.caption(str(e))
-        return False, str(e)
-
-def append_sheet(title, headers, df):
-    spreadsheet = get_spreadsheet()
-    if spreadsheet is None:
-        return False, "Google Sheets is not connected."
-
-    worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    if worksheet is None:
-        return False, f"Could not access tab: {title}"
-
-    try:
-        rows = clean_df_for_sheets(df, headers)
-        if rows:
-            worksheet.append_rows(rows, value_input_option="USER_ENTERED")
-        return True, f"{title} saved."
-    except Exception as e:
-        st.error(f"Could not append to tab: {title}")
-        st.caption(str(e))
-        return False, str(e)
-
 def read_sheet(title, headers):
-    spreadsheet = get_spreadsheet()
-    if spreadsheet is None:
+    ss = get_spreadsheet()
+    if ss is None:
         return pd.DataFrame(columns=headers)
-
-    worksheet = get_or_create_worksheet(spreadsheet, title, headers)
-    if worksheet is None:
+    ws = get_or_create_worksheet(ss, title, headers)
+    if ws is None:
+        st.info(f"Google Sheet tab '{title}' is not ready yet.")
         return pd.DataFrame(columns=headers)
-
     try:
-        records = worksheet.get_all_records()
-    except Exception as e:
-        st.warning(f"Could not read tab: {title}")
-        st.caption(str(e))
+        records = ws.get_all_records()
+    except Exception:
         return pd.DataFrame(columns=headers)
-
     if not records:
         return pd.DataFrame(columns=headers)
-
     df = pd.DataFrame(records)
     for col in headers:
         if col not in df.columns:
             df[col] = ""
     return df[headers]
 
+def rewrite_sheet(title, headers, df):
+    ss = get_spreadsheet()
+    if ss is None:
+        return False, "Google Sheets is not connected."
+    ws = get_or_create_worksheet(ss, title, headers)
+    if ws is None:
+        return False, f"Could not access tab: {title}"
+    try:
+        ws.clear()
+        ws.update("A1", [headers])
+        rows = clean_df_for_sheets(df, headers)
+        if rows:
+            ws.append_rows(rows, value_input_option="USER_ENTERED")
+        return True, f"{title} updated."
+    except Exception as e:
+        return False, str(e)
+
+def append_sheet(title, headers, df):
+    ss = get_spreadsheet()
+    if ss is None:
+        return False, "Google Sheets is not connected."
+    ws = get_or_create_worksheet(ss, title, headers)
+    if ws is None:
+        return False, f"Could not access tab: {title}"
+    try:
+        rows = clean_df_for_sheets(df, headers)
+        if rows:
+            ws.append_rows(rows, value_input_option="USER_ENTERED")
+        return True, f"{title} saved."
+    except Exception as e:
+        return False, str(e)
+
 
 # =========================================================
-# SHEET SCHEMAS
+# SHEET HEADERS
 # =========================================================
+def food_options_headers():
+    return [
+        "meal_slot", "component_slot", "option_name",
+        "calories", "protein", "carbs", "fat",
+        "cost_estimate", "is_outside_meal",
+        "ingredient_name", "ingredient_qty", "ingredient_unit",
+        "active", "default_choice"
+    ]
+
+def grocery_headers():
+    return ["item", "category", "suggested_qty", "unit", "default_price", "storage", "low_stock_at", "notes"]
+
 def daily_headers():
-    return ["saved_at", "plan_date", "meal_slot", "component_slot", "component_name", "calories", "protein", "carbs", "fat", "cost", "ingredients_json"]
+    return [
+        "saved_at", "plan_date", "meal_slot", "component_slot", "component_name",
+        "calories", "protein", "carbs", "fat", "cost",
+        "cost_type", "ingredients_json"
+    ]
 
 def shopping_headers():
     return ["shopping_id", "saved_at", "item", "category", "qty_bought", "unit", "unit_price", "total_cost", "storage"]
@@ -626,13 +347,111 @@ def inventory_headers():
 def budget_headers():
     return ["date", "type", "description", "amount"]
 
-def food_coach_headers():
-    return ["item", "category", "suggested_qty", "unit", "default_price", "storage", "low_stock_at", "notes"]
+
+# =========================================================
+# DEFAULT SEED DATA
+# =========================================================
+DEFAULT_FOOD_OPTIONS = [
+    # Breakfast
+    ["Breakfast","Drink","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Breakfast","Drink","Protein iced coffee",380,54,24,10,2.00,False,"Whey protein",2,"scoops","TRUE","TRUE"],
+    ["Breakfast","Drink","Regular cold coffee",40,1,8,1,0.50,False,"Cold coffee",1,"serving","TRUE","FALSE"],
+    ["Breakfast","Drink","Whole milk",150,8,12,8,0.75,False,"Whole milk",8,"oz","TRUE","FALSE"],
+    ["Breakfast","Main","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Breakfast","Main","Peanut butter bagel",470,18,58,19,1.25,False,"Bagel",1,"bagel","TRUE","TRUE"],
+    ["Breakfast","Main","Greek yogurt + granola bowl",350,20,45,8,2.00,False,"Greek yogurt",1,"serving","TRUE","FALSE"],
+    ["Breakfast","Side","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Breakfast","Side","Banana",120,1,31,0,0.35,False,"Banana",1,"banana","TRUE","FALSE"],
+    ["Breakfast","Side","2 boiled eggs",140,12,1,10,1.10,False,"Boiled eggs",2,"eggs","TRUE","TRUE"],
+    ["Breakfast","Side","Protein bar",200,20,22,6,1.25,False,"Protein bar",1,"bar","TRUE","FALSE"],
+    ["Breakfast","Dessert/Treat","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Breakfast","Dessert/Treat","Banana",120,1,31,0,0.35,False,"Banana",1,"banana","TRUE","TRUE"],
+    ["Breakfast","Dessert/Treat","Greek yogurt",150,18,12,3,1.25,False,"Greek yogurt",1,"serving","TRUE","FALSE"],
+
+    # Lunch
+    ["Lunch","Drink","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Lunch","Drink","Water",0,0,0,0,0,False,"",0,"","TRUE","TRUE"],
+    ["Lunch","Main","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Lunch","Main","Subway Footlong Turkey",850,60,95,22,12.00,True,"Subway Footlong Turkey",1,"meal","TRUE","TRUE"],
+    ["Lunch","Main","Subway Footlong Rotisserie Chicken",900,65,95,25,13.00,True,"Subway Footlong Rotisserie Chicken",1,"meal","TRUE","FALSE"],
+    ["Lunch","Main","Grocery store deli sandwich",700,35,75,25,7.00,True,"Grocery store deli sandwich",1,"meal","TRUE","FALSE"],
+    ["Lunch","Main","Vitality Bowl protein wrap",700,30,75,24,15.00,True,"Vitality Bowl protein wrap",1,"meal","TRUE","FALSE"],
+    ["Lunch","Main","Jersey Mike's Giant Turkey Sub",1100,70,120,38,15.00,True,"Jersey Mike's Giant Turkey Sub",1,"meal","TRUE","FALSE"],
+    ["Lunch","Side","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Lunch","Side","Protein bar",200,20,22,6,1.25,False,"Protein bar",1,"bar","TRUE","TRUE"],
+    ["Lunch","Side","Banana",120,1,31,0,0.35,False,"Banana",1,"banana","TRUE","FALSE"],
+    ["Lunch","Side","Trail mix",380,9,35,24,1.15,False,"Trail mix",1,"serving","TRUE","FALSE"],
+    ["Lunch","Dessert/Treat","None",0,0,0,0,0,False,"",0,"","TRUE","TRUE"],
+
+    # Snack
+    ["Snack","Drink","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Snack","Drink","Water",0,0,0,0,0,False,"",0,"","TRUE","TRUE"],
+    ["Snack","Main","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Snack","Main","Greek yogurt + granola bowl",350,20,45,8,2.00,False,"Greek yogurt",1,"serving","TRUE","TRUE"],
+    ["Snack","Main","Peanut butter bagel",470,18,58,19,1.25,False,"Bagel",1,"bagel","TRUE","FALSE"],
+    ["Snack","Side","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Snack","Side","Trail mix",380,9,35,24,1.15,False,"Trail mix",1,"serving","TRUE","TRUE"],
+    ["Snack","Side","Banana",120,1,31,0,0.35,False,"Banana",1,"banana","TRUE","FALSE"],
+    ["Snack","Side","Protein bar",200,20,22,6,1.25,False,"Protein bar",1,"bar","TRUE","FALSE"],
+    ["Snack","Dessert/Treat","None",0,0,0,0,0,False,"",0,"","TRUE","TRUE"],
+
+    # Dinner
+    ["Dinner","Drink","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Dinner","Drink","Water",0,0,0,0,0,False,"",0,"","TRUE","TRUE"],
+    ["Dinner","Main","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Dinner","Main","Rotisserie chicken portion",550,65,0,30,2.50,False,"Rotisserie chicken portion",1,"portion","TRUE","TRUE"],
+    ["Dinner","Main","Grocery store deli sandwich",700,35,75,25,7.00,True,"Grocery store deli sandwich",1,"meal","TRUE","FALSE"],
+    ["Dinner","Side","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Dinner","Side","Whole wheat bagel",250,10,48,2,0.75,False,"Whole wheat bagel",1,"bagel","TRUE","TRUE"],
+    ["Dinner","Side","Rice cup",220,4,46,2,1.25,False,"Rice cup",1,"cup","TRUE","FALSE"],
+    ["Dinner","Side","Whole wheat bread serving",240,8,44,4,0.75,False,"Whole wheat bread serving",1,"serving","TRUE","FALSE"],
+    ["Dinner","Dessert/Treat","None",0,0,0,0,0,False,"",0,"","TRUE","FALSE"],
+    ["Dinner","Dessert/Treat","Greek yogurt",150,18,12,3,1.25,False,"Greek yogurt",1,"serving","TRUE","TRUE"],
+    ["Dinner","Dessert/Treat","Protein bar",200,20,22,6,1.25,False,"Protein bar",1,"bar","TRUE","FALSE"],
+]
+
+DEFAULT_GROCERY = [
+    ["Whey protein","Monthly",60,"scoops",60.00,"Room temp",10,"1 large Costco tub"],
+    ["Peanut butter","Monthly",64,"tbsp",10.00,"Room temp",4,"1 large jar"],
+    ["Trail mix","Monthly",20,"servings",15.00,"Room temp",3,"1 large bag"],
+    ["Protein bar","Monthly",12,"bars",20.00,"Room temp",3,"1 box"],
+    ["Granola","Monthly",16,"servings",8.00,"Room temp",3,"1 large bag"],
+    ["Whole milk","Weekly",128,"oz",8.00,"Mini fridge",32,"1 gallon"],
+    ["Cold coffee","Weekly",7,"servings",5.00,"Room temp/fridge",2,"Cold brew"],
+    ["Bagel","Weekly",12,"bagels",8.00,"Room temp",3,"2 packs"],
+    ["Whole wheat bagel","Weekly",6,"bagels",5.00,"Room temp",2,"1 pack"],
+    ["Banana","Weekly",14,"bananas",4.00,"Room temp",3,"10-14 bananas"],
+    ["Greek yogurt","Weekly",8,"servings",8.00,"Mini fridge",2,"1 pack/tub"],
+    ["Boiled eggs","Weekly",12,"eggs",7.00,"Mini fridge",2,"pre-boiled pack"],
+    ["Rotisserie chicken portion","Weekly",6,"portions",10.00,"Mini fridge",1,"2 chickens, portioned"],
+    ["Rice cup","Weekly",4,"cups",5.00,"Room temp",1,"microwave rice cups"],
+    ["Whole wheat bread serving","Weekly",6,"servings",5.00,"Room temp",2,"1 loaf"],
+]
 
 
 # =========================================================
-# DATA READ / WRITE
+# READ DATA
 # =========================================================
+@st.cache_data(ttl=60)
+def read_food_options():
+    df = read_sheet("Food_Options", food_options_headers())
+    if df.empty or df["option_name"].astype(str).str.strip().eq("").all():
+        df = pd.DataFrame(DEFAULT_FOOD_OPTIONS, columns=food_options_headers())
+    for col in ["calories", "protein", "carbs", "fat", "cost_estimate", "ingredient_qty"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    df["active"] = df["active"].astype(str).str.lower().isin(["true", "yes", "1", "y"])
+    df["default_choice"] = df["default_choice"].astype(str).str.lower().isin(["true", "yes", "1", "y"])
+    df["is_outside_meal"] = df["is_outside_meal"].astype(str).str.lower().isin(["true", "yes", "1", "y"])
+    return df
+
+def read_grocery_input():
+    df = read_sheet("Food_Coach_Input", grocery_headers())
+    if df.empty or df["item"].astype(str).str.strip().eq("").all():
+        df = pd.DataFrame(DEFAULT_GROCERY, columns=grocery_headers())
+    for col in ["suggested_qty", "default_price", "low_stock_at"]:
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
+    return df
+
 def read_daily_logs():
     df = read_sheet("Daily_Logs", daily_headers())
     for col in ["calories", "protein", "carbs", "fat", "cost"]:
@@ -656,121 +475,112 @@ def read_budget_logs():
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
     return df
 
-def read_food_coach_input():
-    df = read_sheet("Food_Coach_Input", food_coach_headers())
-    for col in ["suggested_qty", "default_price", "low_stock_at"]:
-        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0)
-    return df
 
-def append_food_coach_item(item, category, qty, unit, price, storage, low_stock_at, notes):
-    df = pd.DataFrame([{
-        "item": item,
-        "category": category,
-        "suggested_qty": float(qty),
-        "unit": unit,
-        "default_price": float(price),
-        "storage": storage,
-        "low_stock_at": float(low_stock_at),
-        "notes": notes,
-    }])
-    return append_sheet("Food_Coach_Input", food_coach_headers(), df)
-
-def setup_required_tabs():
-    """
-    Optional setup button helper. Creates all required tabs cleanly.
-    """
+# =========================================================
+# SETUP / SEED
+# =========================================================
+def setup_required_tabs(seed_defaults=False):
     if not google_sheets_is_configured():
         return False, "Google Sheets is not connected."
 
-    spreadsheet = get_spreadsheet()
-    if spreadsheet is None:
-        return False, "Could not open spreadsheet."
-
+    ss = get_spreadsheet()
     required = [
+        ("Food_Options", food_options_headers()),
+        ("Food_Coach_Input", grocery_headers()),
         ("Daily_Logs", daily_headers()),
         ("Shopping_Trips", shopping_headers()),
         ("Inventory", inventory_headers()),
         ("Budget_Log", budget_headers()),
     ]
-
     for title, headers in required:
-        ws = get_or_create_worksheet(spreadsheet, title, headers)
+        ws = get_or_create_worksheet(ss, title, headers)
         if ws is None:
             return False, f"Could not create/access {title}"
 
-    return True, "Required Google Sheets tabs are ready."
+    if seed_defaults:
+        food_df = read_sheet("Food_Options", food_options_headers())
+        grocery_df = read_sheet("Food_Coach_Input", grocery_headers())
+        if food_df.empty or food_df["option_name"].astype(str).str.strip().eq("").all():
+            rewrite_sheet("Food_Options", food_options_headers(), pd.DataFrame(DEFAULT_FOOD_OPTIONS, columns=food_options_headers()))
+        if grocery_df.empty or grocery_df["item"].astype(str).str.strip().eq("").all():
+            rewrite_sheet("Food_Coach_Input", grocery_headers(), pd.DataFrame(DEFAULT_GROCERY, columns=grocery_headers()))
+        st.cache_data.clear()
 
-def save_budget_entry(entry_date, entry_type, description, amount):
-    df = pd.DataFrame([{
-        "date": str(entry_date),
-        "type": entry_type,
-        "description": description,
-        "amount": float(amount)
-    }])
-    return append_sheet("Budget_Log", budget_headers(), df)
+    return True, "Required tabs are ready."
 
-def update_inventory_with_purchase(shopping_df):
-    inventory = read_inventory()
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    if inventory.empty:
-        inventory = pd.DataFrame(columns=inventory_headers())
+# =========================================================
+# CALCULATIONS
+# =========================================================
+def get_options(food_df, meal_slot, component_slot):
+    opts = food_df[
+        (food_df["meal_slot"].astype(str) == meal_slot)
+        & (food_df["component_slot"].astype(str) == component_slot)
+        & (food_df["active"] == True)
+    ].copy()
+    if opts.empty:
+        opts = pd.DataFrame([{
+            "meal_slot": meal_slot, "component_slot": component_slot, "option_name": "None",
+            "calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost_estimate": 0,
+            "is_outside_meal": False, "ingredient_name": "", "ingredient_qty": 0,
+            "ingredient_unit": "", "active": True, "default_choice": True
+        }])
+    return opts
 
-    for _, row in shopping_df.iterrows():
-        item = str(row["item"])
-        qty = float(row["qty_bought"])
-        if qty <= 0:
-            continue
+def option_to_component(row):
+    return {
+        "name": str(row["option_name"]),
+        "calories": float(row["calories"]),
+        "protein": float(row["protein"]),
+        "carbs": float(row["carbs"]),
+        "fat": float(row["fat"]),
+        "cost_estimate": float(row["cost_estimate"]),
+        "is_outside_meal": bool(row["is_outside_meal"]),
+        "ingredient_name": str(row["ingredient_name"]) if pd.notna(row["ingredient_name"]) else "",
+        "ingredient_qty": float(row["ingredient_qty"]),
+        "ingredient_unit": str(row["ingredient_unit"]) if pd.notna(row["ingredient_unit"]) else "",
+    }
 
-        category = str(row.get("category", ""))
-        unit = str(row.get("unit", ""))
-        unit_price = float(row.get("unit_price", 0))
-        storage = str(row.get("storage", ""))
-        low_stock_at = float(row.get("low_stock_at", 0)) if "low_stock_at" in row else 0
+def totals_from_components(components):
+    totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
+    for c in components:
+        totals["calories"] += c["calories"]
+        totals["protein"] += c["protein"]
+        totals["carbs"] += c["carbs"]
+        totals["fat"] += c["fat"]
+        totals["cost"] += c["cost_estimate"]
+    return totals
 
-        match = inventory["item"].astype(str) == item if not inventory.empty else pd.Series(dtype=bool)
+def inventory_unit_prices():
+    inv = read_inventory()
+    lookup = {}
+    if not inv.empty:
+        for _, r in inv.iterrows():
+            item = str(r["item"])
+            price = float(r["last_unit_price"])
+            if item and price > 0:
+                lookup[item] = price
+    return lookup
 
-        if not inventory.empty and match.any():
-            idx = inventory[match].index[0]
-            inventory.loc[idx, "qty_on_hand"] = float(inventory.loc[idx, "qty_on_hand"]) + qty
-            inventory.loc[idx, "last_unit_price"] = unit_price
-            inventory.loc[idx, "last_updated"] = now
-        else:
-            inventory = pd.concat([inventory, pd.DataFrame([{
-                "item": item,
-                "category": category,
-                "qty_on_hand": qty,
-                "unit": unit,
-                "last_unit_price": unit_price,
-                "storage": storage,
-                "low_stock_at": low_stock_at,
-                "last_updated": now
-            }])], ignore_index=True)
+def estimated_unit_prices_from_coach():
+    grocery = read_grocery_input()
+    lookup = {}
+    for _, r in grocery.iterrows():
+        item = str(r["item"])
+        qty = float(r["suggested_qty"])
+        price = float(r["default_price"])
+        if item and qty > 0:
+            lookup[item] = price / qty
+    return lookup
 
-    rewrite_sheet("Inventory", inventory_headers(), inventory)
-    return inventory
+def cost_breakdown_from_selections(selections):
+    actual_prices = inventory_unit_prices()
+    estimated_prices = estimated_unit_prices_from_coach()
 
-def deduct_inventory(ingredients):
-    inventory = read_inventory()
-    if inventory.empty:
-        return False, "No inventory found yet. Use Shopping Mode first."
-
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    for item, qty_used in ingredients.items():
-        match = inventory["item"].astype(str) == str(item)
-        if match.any():
-            idx = inventory[match].index[0]
-            inventory.loc[idx, "qty_on_hand"] = max(float(inventory.loc[idx, "qty_on_hand"]) - float(qty_used), 0)
-            inventory.loc[idx, "last_updated"] = now
-
-    rewrite_sheet("Inventory", inventory_headers(), inventory)
-    return True, "Inventory deducted based on saved meals."
-
-def save_day(plan_date, selections, deduct=True):
     rows = []
-    ingredients_used = {}
-    saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    grocery_actual = 0
+    grocery_estimated = 0
+    outside_total = 0
 
     for meal_slot, meal_data in selections.items():
         if not meal_data["include"]:
@@ -778,6 +588,102 @@ def save_day(plan_date, selections, deduct=True):
         for component_slot, comp in meal_data["components"].items():
             if comp["name"] == "None":
                 continue
+
+            if comp["is_outside_meal"]:
+                outside_total += comp["cost_estimate"]
+                rows.append({
+                    "Item": comp["name"],
+                    "Type": "Outside Meal",
+                    "Qty Used": 1,
+                    "Unit Cost": comp["cost_estimate"],
+                    "Cost Used": comp["cost_estimate"],
+                    "Cost Source": "Outside meal price"
+                })
+            else:
+                item = comp["ingredient_name"]
+                qty = comp["ingredient_qty"]
+                if not item or qty <= 0:
+                    continue
+
+                if item in actual_prices:
+                    unit = actual_prices[item]
+                    source = "Actual shopping price"
+                    cost = unit * qty
+                    grocery_actual += cost
+                elif item in estimated_prices:
+                    unit = estimated_prices[item]
+                    source = "Estimated price"
+                    cost = unit * qty
+                    grocery_estimated += cost
+                else:
+                    unit = comp["cost_estimate"] / qty if qty > 0 else comp["cost_estimate"]
+                    source = "Estimated from meal option"
+                    cost = comp["cost_estimate"]
+                    grocery_estimated += cost
+
+                rows.append({
+                    "Item": item,
+                    "Type": "Grocery",
+                    "Qty Used": qty,
+                    "Unit Cost": round(unit, 2),
+                    "Cost Used": round(cost, 2),
+                    "Cost Source": source
+                })
+
+    df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=["Item", "Type", "Qty Used", "Unit Cost", "Cost Used", "Cost Source"])
+    return df, grocery_actual, grocery_estimated, outside_total
+
+def save_budget_entry(entry_date, entry_type, description, amount):
+    df = pd.DataFrame([{
+        "date": str(entry_date),
+        "type": entry_type,
+        "description": description,
+        "amount": float(amount),
+    }])
+    return append_sheet("Budget_Log", budget_headers(), df)
+
+def deduct_inventory(components):
+    inventory = read_inventory()
+    if inventory.empty:
+        return False, "No inventory found yet. Use Shopping Mode first."
+
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    for comp in components:
+        if comp["is_outside_meal"]:
+            continue
+        item = comp["ingredient_name"]
+        qty = comp["ingredient_qty"]
+        if not item or qty <= 0:
+            continue
+        match = inventory["item"].astype(str) == str(item)
+        if match.any():
+            idx = inventory[match].index[0]
+            inventory.loc[idx, "qty_on_hand"] = max(float(inventory.loc[idx, "qty_on_hand"]) - float(qty), 0)
+            inventory.loc[idx, "last_updated"] = now
+    rewrite_sheet("Inventory", inventory_headers(), inventory)
+    return True, "Inventory deducted."
+
+def save_day(plan_date, selections, deduct=True):
+    saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    cost_df, grocery_actual, grocery_estimated, outside_total = cost_breakdown_from_selections(selections)
+    rows = []
+    components_to_deduct = []
+
+    for meal_slot, meal_data in selections.items():
+        if not meal_data["include"]:
+            continue
+        for component_slot, comp in meal_data["components"].items():
+            if comp["name"] == "None":
+                continue
+
+            if comp["is_outside_meal"]:
+                cost = comp["cost_estimate"]
+                cost_type = "Outside meal"
+            else:
+                match = cost_df[(cost_df["Item"] == comp["ingredient_name"]) & (cost_df["Type"] == "Grocery")]
+                cost = float(match.iloc[0]["Cost Used"]) if not match.empty else comp["cost_estimate"]
+                cost_type = str(match.iloc[0]["Cost Source"]) if not match.empty else "Estimated"
+
             rows.append({
                 "saved_at": saved_at,
                 "plan_date": str(plan_date),
@@ -788,11 +694,16 @@ def save_day(plan_date, selections, deduct=True):
                 "protein": comp["protein"],
                 "carbs": comp["carbs"],
                 "fat": comp["fat"],
-                "cost": comp["cost"],
-                "ingredients_json": json.dumps(comp["ingredients"]),
+                "cost": cost,
+                "cost_type": cost_type,
+                "ingredients_json": json.dumps({
+                    "ingredient_name": comp["ingredient_name"],
+                    "ingredient_qty": comp["ingredient_qty"],
+                    "ingredient_unit": comp["ingredient_unit"],
+                    "is_outside_meal": comp["is_outside_meal"],
+                }),
             })
-            for item, qty in comp["ingredients"].items():
-                ingredients_used[item] = ingredients_used.get(item, 0) + qty
+            components_to_deduct.append(comp)
 
     if not rows:
         return False, "No included meals to save."
@@ -805,83 +716,47 @@ def save_day(plan_date, selections, deduct=True):
     rewrite_sheet("Daily_Logs", daily_headers(), combined)
 
     if deduct:
-        deduct_inventory(ingredients_used)
+        deduct_inventory(components_to_deduct)
 
-    meal_cost = float(new_df["cost"].sum())
-    save_budget_entry(plan_date, "Meal Plan Estimated Cost", "Included meal components", meal_cost)
+    total_food_cost = grocery_actual + grocery_estimated + outside_total
+    save_budget_entry(plan_date, "Food Cost", "Groceries used + outside meals", total_food_cost)
 
     return True, f"Saved {len(rows)} items for {plan_date}."
 
+def update_inventory_with_purchase(shopping_df):
+    inv = read_inventory()
+    if inv.empty:
+        inv = pd.DataFrame(columns=inventory_headers())
 
-# =========================================================
-# APP HELPERS
-# =========================================================
-def component_names(slot, meal_slot=None):
-    if meal_slot and meal_slot in MEAL_ALLOWED_OPTIONS:
-        allowed = MEAL_ALLOWED_OPTIONS[meal_slot].get(slot, [])
-        return allowed + ["Other / Custom"]
-    return [x["name"] for x in COMPONENTS[slot]] + ["Other / Custom"]
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-def get_component(slot, name):
-    for x in COMPONENTS[slot]:
-        if x["name"] == name:
-            return x
-    return COMPONENTS[slot][0]
-
-def make_custom_component(name, calories, protein, carbs, fat, cost):
-    return {
-        "name": name if name else "Custom item",
-        "calories": float(calories),
-        "protein": float(protein),
-        "carbs": float(carbs),
-        "fat": float(fat),
-        "cost": float(cost),
-        "ingredients": {name if name else "Custom item": 1}
-    }
-
-def totals_from_components(components):
-    totals = {"calories": 0, "protein": 0, "carbs": 0, "fat": 0, "cost": 0}
-    for comp in components:
-        totals["calories"] += float(comp["calories"])
-        totals["protein"] += float(comp["protein"])
-        totals["carbs"] += float(comp["carbs"])
-        totals["fat"] += float(comp["fat"])
-        totals["cost"] += float(comp["cost"])
-    return totals
-
-def load_saved_day_defaults(plan_date):
-    logs = read_daily_logs()
-    if logs.empty:
-        return {}
-    d = logs[logs["plan_date"].astype(str) == str(plan_date)]
-    defaults = {}
-    for _, row in d.iterrows():
-        defaults[(row["meal_slot"], row["component_slot"])] = row["component_name"]
-    return defaults
-
-def grocery_from_selections(selections):
-    items = {}
-    for meal_data in selections.values():
-        if not meal_data["include"]:
+    for _, r in shopping_df.iterrows():
+        item = str(r["item"])
+        qty = float(r["qty_bought"])
+        unit_price = float(r["unit_price"])
+        if not item or qty <= 0:
             continue
-        for comp in meal_data["components"].values():
-            for item, qty in comp["ingredients"].items():
-                items[item] = items.get(item, 0) + qty
 
-    if not items:
-        return pd.DataFrame(columns=["Item", "Estimated Used", "Unit Cost", "Estimated Cost Used"])
+        match = inv["item"].astype(str) == item if not inv.empty else pd.Series(dtype=bool)
+        if not inv.empty and match.any():
+            idx = inv[match].index[0]
+            inv.loc[idx, "qty_on_hand"] = float(inv.loc[idx, "qty_on_hand"]) + qty
+            inv.loc[idx, "last_unit_price"] = unit_price
+            inv.loc[idx, "last_updated"] = now
+        else:
+            inv = pd.concat([inv, pd.DataFrame([{
+                "item": item,
+                "category": str(r.get("category", "")),
+                "qty_on_hand": qty,
+                "unit": str(r.get("unit", "")),
+                "last_unit_price": unit_price,
+                "storage": str(r.get("storage", "")),
+                "low_stock_at": float(r.get("low_stock_at", 0)),
+                "last_updated": now,
+            }])], ignore_index=True)
 
-    prices = item_unit_price_lookup()
-    rows = []
-    for item, qty in items.items():
-        unit_cost = float(prices.get(item, 0))
-        rows.append({
-            "Item": item,
-            "Estimated Used": qty,
-            "Unit Cost": round(unit_cost, 2),
-            "Estimated Cost Used": round(unit_cost * float(qty), 2)
-        })
-    return pd.DataFrame(rows).sort_values("Item")
+    rewrite_sheet("Inventory", inventory_headers(), inv)
+    return inv
 
 def low_stock_alerts():
     inv = read_inventory()
@@ -889,77 +764,25 @@ def low_stock_alerts():
         return pd.DataFrame(columns=inventory_headers())
     return inv[(inv["low_stock_at"] > 0) & (inv["qty_on_hand"] <= inv["low_stock_at"])].copy()
 
+def spending_summary():
+    budget = read_budget_logs()
+    shopping = read_shopping_trips()
+    rows = []
+    if not shopping.empty:
+        for _, r in shopping.iterrows():
+            rows.append({"date": str(r["saved_at"])[:10], "source": "Shopping", "amount": float(r["total_cost"])})
+    if not budget.empty:
+        for _, r in budget.iterrows():
+            rows.append({"date": str(r["date"]), "source": str(r["type"]), "amount": float(r["amount"])})
+    return pd.DataFrame(rows) if rows else pd.DataFrame(columns=["date", "source", "amount"])
+
 def week_start(d):
     d = pd.to_datetime(d).date()
     return d - timedelta(days=d.weekday())
 
-def spending_summary():
-    shopping = read_shopping_trips()
-    budget = read_budget_logs()
-
-    rows = []
-    if not shopping.empty:
-        for _, r in shopping.iterrows():
-            rows.append({
-                "date": str(r["saved_at"])[:10],
-                "source": "Shopping",
-                "amount": float(r["total_cost"])
-            })
-    if not budget.empty:
-        for _, r in budget.iterrows():
-            rows.append({
-                "date": str(r["date"]),
-                "source": str(r["type"]),
-                "amount": float(r["amount"])
-            })
-
-    if not rows:
-        return pd.DataFrame(columns=["date", "source", "amount"])
-
-    return pd.DataFrame(rows)
-
-def get_recommended_grocery_items():
-    coach_df = read_food_coach_input()
-    if not coach_df.empty and coach_df["item"].astype(str).str.strip().ne("").any():
-        df = coach_df.copy()
-        df = df[df["item"].astype(str).str.strip() != ""]
-        df = df.rename(columns={
-            "item": "Item",
-            "category": "Category",
-            "suggested_qty": "Suggested Qty",
-            "unit": "Unit",
-            "default_price": "Default Price",
-            "storage": "Storage",
-            "low_stock_at": "Low Stock At",
-        })
-        return df[["Item", "Category", "Suggested Qty", "Unit", "Default Price", "Storage", "Low Stock At"]]
-    return pd.DataFrame(GENERAL_GROCERY)
-
-def make_shopping_base_list():
-    base = get_recommended_grocery_items()
-    base["Buy"] = True
-    base["Suggested Qty"] = pd.to_numeric(base["Suggested Qty"], errors="coerce").fillna(0)
-    base["Default Price"] = pd.to_numeric(base["Default Price"], errors="coerce").fillna(0)
-    base["Qty Bought"] = base["Suggested Qty"]
-    base["Unit Price"] = base.apply(lambda r: round(float(r["Default Price"]) / float(r["Suggested Qty"]), 2) if float(r["Suggested Qty"]) > 0 else 0, axis=1)
-    base["Total Cost"] = base["Default Price"]
-    return base[["Buy", "Item", "Category", "Suggested Qty", "Qty Bought", "Unit", "Unit Price", "Total Cost", "Storage", "Low Stock At"]]
-
-def item_unit_price_lookup():
-    lookup = {}
-    grocery_df = get_recommended_grocery_items()
-    for _, r in grocery_df.iterrows():
-        item = str(r["Item"])
-        qty = float(pd.to_numeric(r["Suggested Qty"], errors="coerce") or 0)
-        price = float(pd.to_numeric(r["Default Price"], errors="coerce") or 0)
-        lookup[item] = price / qty if qty > 0 else price
-    for r in RESTAURANT_ITEMS:
-        lookup[r["Item"]] = float(r["Default Price"])
-    return lookup
-
 
 # =========================================================
-# HEADER + TOP NAV
+# HEADER + NAV
 # =========================================================
 st.markdown("""
 <div class="hero-wrap">
@@ -987,14 +810,14 @@ with nav_cols[3]:
         st.session_state.page = "📊 History + Budget"
 
 page = st.session_state.page
-
 st.markdown("---")
 
 if not google_sheets_is_configured():
     st.warning("Google Sheets is not connected yet. The app layout works, but saving/inventory/history need Google Sheets.")
 
+
 # =========================================================
-# PAGE 1: OVERVIEW
+# OVERVIEW
 # =========================================================
 if page == "🏠 Overview":
     st.subheader("Overview")
@@ -1011,7 +834,6 @@ if page == "🏠 Overview":
             <b>Weight:</b> {CLIENT['weight']}
         </div>
         """, unsafe_allow_html=True)
-
     with c2:
         st.markdown(f"""
         <div class="section-card">
@@ -1023,31 +845,28 @@ if page == "🏠 Overview":
         </div>
         """, unsafe_allow_html=True)
 
-    st.subheader("Cost + Budget Snapshot")
-
     shopping = read_shopping_trips()
     meals = read_daily_logs()
     budget_logs = read_budget_logs()
-
     total_shopping = float(shopping["total_cost"].sum()) if not shopping.empty else 0
-    total_meal_estimate = float(meals["cost"].sum()) if not meals.empty else 0
-    total_extra_budget = float(budget_logs["amount"].sum()) if not budget_logs.empty else 0
+    total_meals = float(meals["cost"].sum()) if not meals.empty else 0
+    total_budget = float(budget_logs["amount"].sum()) if not budget_logs.empty else 0
 
     today = date.today()
-    week = week_start(today)
-    week_end = week + timedelta(days=6)
-
+    wk = week_start(today)
+    wk_end = wk + timedelta(days=6)
     spend_df = spending_summary()
     if not spend_df.empty:
         spend_df["date_dt"] = pd.to_datetime(spend_df["date"], errors="coerce")
-        week_spend = spend_df[(spend_df["date_dt"].dt.date >= week) & (spend_df["date_dt"].dt.date <= week_end)]["amount"].sum()
+        week_spend = spend_df[(spend_df["date_dt"].dt.date >= wk) & (spend_df["date_dt"].dt.date <= wk_end)]["amount"].sum()
     else:
         week_spend = 0
 
+    st.subheader("Cost + Budget Snapshot")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("Shopping Spend", f"${total_shopping:.2f}")
-    m2.metric("Meal Cost So Far", f"${total_meal_estimate:.2f}")
-    m3.metric("Logged Budget Total", f"${total_extra_budget:.2f}")
+    m2.metric("Food Cost Logged", f"${total_meals:.2f}")
+    m3.metric("Budget Log Total", f"${total_budget:.2f}")
     m4.metric("This Week Spend", f"${week_spend:.2f}", delta=f"${CLIENT['weekly_budget'] - week_spend:.2f} left")
 
     st.subheader("Low Stock Notifications")
@@ -1060,7 +879,7 @@ if page == "🏠 Overview":
 
     st.subheader("Spending Trend")
     if spend_df.empty:
-        st.info("No spending history yet. Use Shopping Mode or save meal days first.")
+        st.info("No spending history yet.")
     else:
         daily = spend_df.groupby("date", as_index=False)["amount"].sum()
         daily["daily_budget"] = CLIENT["weekly_budget"] / 7
@@ -1070,76 +889,57 @@ if page == "🏠 Overview":
 
 
 # =========================================================
-# PAGE 2: MEAL BUILDER
+# MEAL BUILDER
 # =========================================================
 elif page == "🍽️ Meal Builder":
     selected_date = st.date_input("Select day/date", value=date.today(), key="meal_date")
     st.subheader(f"Meal Builder — {selected_date.strftime('%A, %b %d, %Y')}")
 
+    food_df = read_food_options()
+    saved = read_daily_logs()
     saved_defaults = {}
-    if google_sheets_is_configured():
-        try:
-            saved_defaults = load_saved_day_defaults(selected_date)
-        except Exception as e:
-            st.error("Could not load saved meal defaults.")
-            st.caption(str(e))
+    if not saved.empty:
+        d = saved[saved["plan_date"].astype(str) == str(selected_date)]
+        for _, row in d.iterrows():
+            saved_defaults[(row["meal_slot"], row["component_slot"])] = row["component_name"]
 
     selections = {}
 
-    for meal_slot in MEAL_SLOTS:
+    for meal_slot in ["Breakfast", "Lunch", "Snack", "Dinner"]:
         selections[meal_slot] = {"include": False, "components": {}}
-
         with st.expander(meal_slot, expanded=True):
-            include_meal = st.checkbox(
-                f"Include {meal_slot}",
-                value=True,
-                key=f"{selected_date}_{meal_slot}_include"
-            )
-            selections[meal_slot]["include"] = include_meal
+            include = st.checkbox(f"Include {meal_slot}", value=True, key=f"{selected_date}_{meal_slot}_include")
+            selections[meal_slot]["include"] = include
 
             cols = st.columns(4)
-            for i, component_slot in enumerate(COMPONENT_SLOTS):
+            for i, component_slot in enumerate(["Drink", "Main", "Side", "Dessert/Treat"]):
+                opts = get_options(food_df, meal_slot, component_slot)
+                names = opts["option_name"].astype(str).tolist()
+
+                default_name = saved_defaults.get((meal_slot, component_slot), None)
+                if default_name not in names:
+                    defaults = opts[opts["default_choice"] == True]
+                    default_name = str(defaults.iloc[0]["option_name"]) if not defaults.empty else names[0]
+                idx = names.index(default_name) if default_name in names else 0
+
                 with cols[i]:
-                    options = component_names(component_slot, meal_slot)
-                    default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
-                    default_index = options.index(default_name) if default_name in options else 0
-
-                    chosen = st.selectbox(
-                        component_slot,
-                        options,
-                        index=default_index,
-                        key=f"{selected_date}_{meal_slot}_{component_slot}"
-                    )
-
-                    if chosen == "Other / Custom":
-                        st.caption("Custom values")
-                        custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
-                        custom_cal = st.number_input("Cal", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
-                        custom_pro = st.number_input("Protein", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
-                        custom_carbs = st.number_input("Carbs", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
-                        custom_fat = st.number_input("Fat", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
-                        custom_cost = st.number_input("Cost", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
-                        comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
-                    else:
-                        comp = get_component(component_slot, chosen)
-
+                    chosen = st.selectbox(component_slot, names, index=idx, key=f"{selected_date}_{meal_slot}_{component_slot}")
+                    row = opts[opts["option_name"].astype(str) == chosen].iloc[0]
+                    comp = option_to_component(row)
                     selections[meal_slot]["components"][component_slot] = comp
-
                     st.markdown(
                         f"""
                         <div class="compact-kpi">
                             <div class="compact-name">{comp['name']}</div>
-                            <div class="compact-macro">
-                                {comp['calories']:.0f} cal<br>
-                                {comp['protein']:.0f}g protein<br>
-                                ${comp['cost']:.2f}
-                            </div>
+                            {comp['calories']:.0f} cal<br>
+                            {comp['protein']:.0f}g protein<br>
+                            ${comp['cost_estimate']:.2f}
                         </div>
                         """,
                         unsafe_allow_html=True
                     )
 
-            if include_meal:
+            if include:
                 totals = totals_from_components(list(selections[meal_slot]["components"].values()))
                 st.markdown(
                     f"<div class='meal-total'><b>{meal_slot} Total:</b> "
@@ -1148,25 +948,41 @@ elif page == "🍽️ Meal Builder":
                     unsafe_allow_html=True
                 )
             else:
-                st.warning(f"{meal_slot} is skipped. It will not be saved or deducted from inventory.")
+                st.warning(f"{meal_slot} is skipped. It will not be saved or deducted.")
 
     all_components = []
-    for meal_slot, meal_data in selections.items():
-        if meal_data["include"]:
-            all_components.extend(list(meal_data["components"].values()))
+    for m in selections.values():
+        if m["include"]:
+            all_components.extend(list(m["components"].values()))
 
-    daily_totals = totals_from_components(all_components)
+    totals = totals_from_components(all_components)
+    cost_df, grocery_actual, grocery_estimated, outside_total = cost_breakdown_from_selections(selections)
 
     st.subheader("Live Daily Total")
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Calories", f"{daily_totals['calories']:.0f}")
-    c2.metric("Protein", f"{daily_totals['protein']:.0f}g")
-    c3.metric("Carbs", f"{daily_totals['carbs']:.0f}g")
-    c4.metric("Fat", f"{daily_totals['fat']:.0f}g")
-    c5.metric("Cost", f"${daily_totals['cost']:.2f}")
+    c1.metric("Calories", f"{totals['calories']:.0f}")
+    c2.metric("Protein", f"{totals['protein']:.0f}g")
+    c3.metric("Carbs", f"{totals['carbs']:.0f}g")
+    c4.metric("Fat", f"{totals['fat']:.0f}g")
+    c5.metric("Est. Meal Cost", f"${totals['cost']:.2f}")
+
+    st.subheader("Today's Food Cost")
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Actual Groceries Used", f"${grocery_actual:.2f}")
+    c2.metric("Estimated Groceries Used", f"${grocery_estimated:.2f}")
+    c3.metric("Outside Meals", f"${outside_total:.2f}")
+
+    total_food_cost = grocery_actual + grocery_estimated + outside_total
+    st.markdown(
+        f"<div class='cost-box'><b>Total Food Cost Today:</b> ${total_food_cost:.2f}<br>"
+        f"<small>Actual grocery prices are used after Shopping Mode is saved. Otherwise, the app uses Food_Coach_Input estimates.</small></div>",
+        unsafe_allow_html=True
+    )
+
+    st.subheader("Grocery / Outside Meal Cost Breakdown")
+    st.dataframe(cost_df, use_container_width=True, hide_index=True)
 
     deduct = st.checkbox("Deduct used grocery inventory when saving", value=True)
-
     if st.button("💾 Save Included Meals + Update Inventory", use_container_width=True):
         ok, msg = save_day(selected_date, selections, deduct=deduct)
         if ok:
@@ -1174,71 +990,44 @@ elif page == "🍽️ Meal Builder":
         else:
             st.warning(msg)
 
-    st.subheader("Grocery Use From This Day")
-    grocery_used_df = grocery_from_selections(selections)
-    st.dataframe(grocery_used_df, use_container_width=True, hide_index=True)
-    used_cost = float(grocery_used_df["Estimated Cost Used"].sum()) if not grocery_used_df.empty and "Estimated Cost Used" in grocery_used_df.columns else 0
-    st.markdown(
-        f"<div class='grocery-cost-note'><b>Estimated grocery value used today:</b> ${used_cost:.2f}</div>",
-        unsafe_allow_html=True
-    )
-
 
 # =========================================================
-# PAGE 3: GROCERY + SHOPPING
+# GROCERY + SHOPPING
 # =========================================================
 elif page == "🛒 Grocery + Shopping":
-    st.subheader("General Grocery Lists")
+    st.subheader("Grocery + Shopping")
+
     weekly_budget = st.number_input("Weekly budget", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5, key="grocery_budget")
     st.metric("Daily Budget Target", f"${weekly_budget / 7:.2f}")
 
+    grocery_df = read_grocery_input()
     st.markdown("### Food Coach Recommended Grocery Plan")
-    coach_items_df = get_recommended_grocery_items()
-    st.dataframe(coach_items_df, use_container_width=True, hide_index=True)
+    st.caption("Edit this in the Google Sheet tab named Food_Coach_Input. The app reads it dynamically.")
+    st.dataframe(grocery_df, use_container_width=True, hide_index=True)
 
     st.markdown("### Monthly Buy")
-    monthly_df = coach_items_df[coach_items_df["Category"].astype(str).str.lower() == "monthly"] if not coach_items_df.empty else pd.DataFrame(GENERAL_MONTHLY)
-    st.dataframe(monthly_df, use_container_width=True, hide_index=True)
+    st.dataframe(grocery_df[grocery_df["category"].astype(str).str.lower() == "monthly"], use_container_width=True, hide_index=True)
 
     st.markdown("### Weekly Refill")
-    weekly_df = coach_items_df[coach_items_df["Category"].astype(str).str.lower() == "weekly"] if not coach_items_df.empty else pd.DataFrame(GENERAL_WEEKLY)
-    st.dataframe(weekly_df, use_container_width=True, hide_index=True)
-
-    st.markdown("### Add Item to Food Coach Input")
-    with st.expander("➕ Add custom grocery item", expanded=False):
-        c1, c2 = st.columns(2)
-        with c1:
-            new_item = st.text_input("Item name")
-            new_category = st.selectbox("Category", ["Weekly", "Monthly", "Restaurant", "Custom"])
-            new_qty = st.number_input("Suggested quantity", min_value=0.0, value=1.0, step=1.0)
-            new_unit = st.text_input("Unit", value="serving")
-        with c2:
-            new_price = st.number_input("Default total price", min_value=0.0, value=0.0, step=0.25)
-            new_storage = st.text_input("Storage", value="Room temp")
-            new_low = st.number_input("Low stock alert at", min_value=0.0, value=1.0, step=1.0)
-            new_notes = st.text_input("Notes", value="")
-
-        if st.button("Save Item to Food Coach Input"):
-            if not new_item.strip():
-                st.warning("Add an item name first.")
-            else:
-                ok, msg = append_food_coach_item(new_item, new_category, new_qty, new_unit, new_price, new_storage, new_low, new_notes)
-                if ok:
-                    st.success("Item saved to Food_Coach_Input. Refresh the app to see it in the list.")
-                else:
-                    st.warning(msg)
+    st.dataframe(grocery_df[grocery_df["category"].astype(str).str.lower() == "weekly"], use_container_width=True, hide_index=True)
 
     st.markdown("---")
     shopping_mode = st.toggle("🛒 Turn On Shopping Mode", value=False)
 
     if shopping_mode:
-        st.subheader("Shopping Mode")
-        st.caption("Check what you are buying, edit quantity and price, then save. This updates inventory and shopping spend.")
-
-        shopping_base = make_shopping_base_list()
+        base = grocery_df.copy()
+        base = base.rename(columns={
+            "item": "Item", "category": "Category", "suggested_qty": "Suggested Qty",
+            "unit": "Unit", "default_price": "Default Price", "storage": "Storage", "low_stock_at": "Low Stock At"
+        })
+        base["Buy"] = True
+        base["Qty Bought"] = base["Suggested Qty"]
+        base["Unit Price"] = base.apply(lambda r: round(float(r["Default Price"]) / float(r["Suggested Qty"]), 2) if float(r["Suggested Qty"]) > 0 else 0, axis=1)
+        base["Total Cost"] = base["Qty Bought"] * base["Unit Price"]
+        view = base[["Buy", "Item", "Category", "Suggested Qty", "Qty Bought", "Unit", "Unit Price", "Total Cost", "Storage", "Low Stock At"]]
 
         edited = st.data_editor(
-            shopping_base,
+            view,
             use_container_width=True,
             hide_index=True,
             num_rows="dynamic",
@@ -1248,104 +1037,80 @@ elif page == "🛒 Grocery + Shopping":
                 "Unit Price": st.column_config.NumberColumn("Unit Price", min_value=0.0, step=0.25, format="$%.2f"),
                 "Total Cost": st.column_config.NumberColumn("Total Cost", min_value=0.0, step=0.25, format="$%.2f"),
             },
-            key="shopping_editor"
         )
-
         edited["Qty Bought"] = pd.to_numeric(edited["Qty Bought"], errors="coerce").fillna(0)
         edited["Unit Price"] = pd.to_numeric(edited["Unit Price"], errors="coerce").fillna(0)
-
-        # Recalculate total cost from qty and unit price
         edited["Total Cost"] = (edited["Qty Bought"] * edited["Unit Price"]).round(2)
-
         selected = edited[(edited["Buy"] == True) & (edited["Qty Bought"] > 0)].copy()
-        shopping_total = float(selected["Total Cost"].sum()) if not selected.empty else 0
+        total = float(selected["Total Cost"].sum()) if not selected.empty else 0
+        st.metric("Shopping Total", f"${total:.2f}")
 
-        st.metric("Shopping Total", f"${shopping_total:.2f}")
-
-        st.markdown("### Add Custom Items")
-        custom_text = st.text_area(
-            "Optional: add custom items, one per line as: item, qty, unit, unit_price",
-            placeholder="Example:\nApples, 6, apples, 0.50\nLow sodium bread, 1, loaf, 4.99"
-        )
-
-        custom_rows = []
-        if custom_text.strip():
-            for line in custom_text.splitlines():
-                parts = [p.strip() for p in line.split(",")]
-                if len(parts) >= 4:
-                    try:
-                        custom_rows.append({
-                            "Buy": True,
-                            "Item": parts[0],
-                            "Category": "Custom",
-                            "Suggested Qty": float(parts[1]),
-                            "Qty Bought": float(parts[1]),
-                            "Unit": parts[2],
-                            "Unit Price": float(parts[3]),
-                            "Total Cost": float(parts[1]) * float(parts[3]),
-                            "Storage": "",
-                            "Low Stock At": 1
-                        })
-                    except ValueError:
-                        st.warning(f"Could not read custom item line: {line}")
-
-        if custom_rows:
-            custom_df = pd.DataFrame(custom_rows)
-            st.dataframe(custom_df, use_container_width=True, hide_index=True)
-            shopping_total += float(custom_df["Total Cost"].sum())
-            st.metric("Updated Total with Custom Items", f"${shopping_total:.2f}")
+        st.markdown("### Add One-Off Shopping Item")
+        with st.expander("➕ Add to this shopping trip only", expanded=False):
+            custom_item = st.text_input("Item")
+            custom_qty = st.number_input("Qty", min_value=0.0, value=0.0, step=1.0)
+            custom_unit = st.text_input("Unit", value="serving")
+            custom_unit_price = st.number_input("Unit Price", min_value=0.0, value=0.0, step=0.25)
 
         if st.button("✅ End Shopping Mode + Save Purchases", use_container_width=True):
-            if selected.empty and not custom_rows:
-                st.warning("No purchased items selected.")
-            else:
-                save_df = selected.copy()
-                if custom_rows:
-                    save_df = pd.concat([save_df, pd.DataFrame(custom_rows)], ignore_index=True)
+            rows = []
+            shopping_id = datetime.now().strftime("%Y%m%d%H%M%S")
+            saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-                shopping_id = datetime.now().strftime("%Y%m%d%H%M%S")
-                saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                trip_df = pd.DataFrame([{
+            for _, r in selected.iterrows():
+                rows.append({
                     "shopping_id": shopping_id,
                     "saved_at": saved_at,
-                    "item": row["Item"],
-                    "category": row["Category"],
-                    "qty_bought": row["Qty Bought"],
-                    "unit": row["Unit"],
-                    "unit_price": row["Unit Price"],
-                    "total_cost": row["Total Cost"],
-                    "storage": row["Storage"],
-                } for _, row in save_df.iterrows()])
+                    "item": r["Item"],
+                    "category": r["Category"],
+                    "qty_bought": r["Qty Bought"],
+                    "unit": r["Unit"],
+                    "unit_price": r["Unit Price"],
+                    "total_cost": r["Total Cost"],
+                    "storage": r["Storage"],
+                    "low_stock_at": r["Low Stock At"],
+                })
 
-                ok, msg = append_sheet("Shopping_Trips", shopping_headers(), trip_df)
+            if custom_item and custom_qty > 0:
+                rows.append({
+                    "shopping_id": shopping_id,
+                    "saved_at": saved_at,
+                    "item": custom_item,
+                    "category": "Custom",
+                    "qty_bought": custom_qty,
+                    "unit": custom_unit,
+                    "unit_price": custom_unit_price,
+                    "total_cost": custom_qty * custom_unit_price,
+                    "storage": "",
+                    "low_stock_at": 1,
+                })
+
+            if not rows:
+                st.warning("No purchased items selected.")
+            else:
+                trip_df = pd.DataFrame(rows)
+                append_df = trip_df[shopping_headers()]
+                ok, msg = append_sheet("Shopping_Trips", shopping_headers(), append_df)
                 if ok:
-                    inv_update_df = save_df.rename(columns={
-                        "Item": "item",
-                        "Category": "category",
-                        "Qty Bought": "qty_bought",
-                        "Unit": "unit",
-                        "Unit Price": "unit_price",
-                        "Storage": "storage",
-                        "Low Stock At": "low_stock_at"
-                    })
-                    update_inventory_with_purchase(inv_update_df)
-                    save_budget_entry(date.today(), "Shopping Trip", "Shopping mode purchase", shopping_total)
+                    update_inventory_with_purchase(trip_df.rename(columns={
+                        "item": "item", "category": "category", "qty_bought": "qty_bought",
+                        "unit": "unit", "unit_price": "unit_price", "storage": "storage", "low_stock_at": "low_stock_at"
+                    }))
+                    save_budget_entry(date.today(), "Shopping Trip", "Shopping mode purchase", float(trip_df["total_cost"].sum()))
                     st.success("Shopping trip saved and inventory updated.")
                 else:
                     st.warning(msg)
 
-    st.markdown("---")
     st.subheader("Current Inventory")
     inv = read_inventory()
     if inv.empty:
-        st.info("No inventory yet. Use Shopping Mode to add purchased groceries.")
+        st.info("No inventory yet. Use Shopping Mode first.")
     else:
         st.dataframe(inv, use_container_width=True, hide_index=True)
 
 
 # =========================================================
-# PAGE 4: HISTORY + BUDGET
+# HISTORY + BUDGET
 # =========================================================
 elif page == "📊 History + Budget":
     st.subheader("Previous Days + Budget Tracking")
@@ -1354,43 +1119,32 @@ elif page == "📊 History + Budget":
         with st.expander("Google Sheets Setup / Repair", expanded=False):
             st.caption("Use this only if Google Sheets tabs are missing or broken.")
             if st.button("Create / Repair Required Google Sheet Tabs"):
-                ok, msg = setup_required_tabs()
-                if ok:
-                    st.success(msg)
-                else:
-                    st.error(msg)
-
+                ok, msg = setup_required_tabs(seed_defaults=False)
+                st.success(msg) if ok else st.error(msg)
+            if st.button("Seed Default Food_Options + Food_Coach_Input"):
+                ok, msg = setup_required_tabs(seed_defaults=True)
+                st.success("Default editable sheet data seeded. Refresh the app.") if ok else st.error(msg)
 
     logs = read_daily_logs()
-
     if logs.empty:
         st.info("No saved meal days yet.")
     else:
         saved_dates = sorted(logs["plan_date"].astype(str).unique(), reverse=True)
         selected_history_date = st.selectbox("Click/select a saved day", saved_dates)
-
         day_df = logs[logs["plan_date"].astype(str) == selected_history_date].copy()
         totals = day_df[["calories", "protein", "carbs", "fat", "cost"]].sum()
-
         c1, c2, c3, c4, c5 = st.columns(5)
         c1.metric("Calories", f"{totals['calories']:.0f}")
         c2.metric("Protein", f"{totals['protein']:.0f}g")
         c3.metric("Carbs", f"{totals['carbs']:.0f}g")
         c4.metric("Fat", f"{totals['fat']:.0f}g")
         c5.metric("Cost", f"${totals['cost']:.2f}")
-
-        st.dataframe(
-            day_df[["meal_slot", "component_slot", "component_name", "calories", "protein", "carbs", "fat", "cost"]],
-            use_container_width=True,
-            hide_index=True
-        )
+        st.dataframe(day_df[["meal_slot", "component_slot", "component_name", "calories", "protein", "carbs", "fat", "cost", "cost_type"]], use_container_width=True, hide_index=True)
 
     st.markdown("---")
     st.subheader("Spending Tracking Graph")
-
-    weekly_budget = st.number_input("Weekly budget for graph", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5, key="budget_graph")
+    weekly_budget = st.number_input("Weekly budget for graph", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5)
     daily_budget = weekly_budget / 7
-
     spend_df = spending_summary()
     if spend_df.empty:
         st.info("No spending data yet.")
@@ -1398,16 +1152,10 @@ elif page == "📊 History + Budget":
         daily = spend_df.groupby("date", as_index=False)["amount"].sum()
         daily["daily_budget"] = daily_budget
         daily["above_below_budget"] = daily["daily_budget"] - daily["amount"]
-
         st.dataframe(daily, use_container_width=True, hide_index=True)
-
-        chart_df = daily.set_index("date")[["amount", "daily_budget"]]
-        st.line_chart(chart_df)
-
-        st.markdown("### Above / Below Budget")
+        st.line_chart(daily.set_index("date")[["amount", "daily_budget"]])
         st.bar_chart(daily.set_index("date")[["above_below_budget"]])
 
-    st.markdown("---")
     st.subheader("Shopping History")
     trips = read_shopping_trips()
     if trips.empty:
@@ -1416,5 +1164,4 @@ elif page == "📊 History + Budget":
         st.dataframe(trips, use_container_width=True, hide_index=True)
 
 
-st.markdown("---")
 st.markdown("<div class='footer-honey'>🍯 Made by Honey</div>", unsafe_allow_html=True)
