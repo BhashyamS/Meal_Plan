@@ -271,6 +271,37 @@ st.markdown("""
             flex: 1 1 100% !important;
         }
     }
+
+    .compact-kpi {
+        background: var(--kpi-bg);
+        color: var(--kpi-text);
+        border: 1px solid var(--kpi-border);
+        border-radius: 14px;
+        padding: 10px 12px;
+        margin-top: 8px;
+        min-height: 112px;
+    }
+
+    .compact-kpi b {
+        color: var(--honey);
+        font-size: 14px;
+    }
+
+    .compact-name {
+        color: var(--app-text);
+        font-weight: 750;
+        font-size: 13px;
+        line-height: 1.25;
+        margin: 5px 0 7px 0;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .compact-macro {
+        font-size: 13px;
+        line-height: 1.45;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1066,46 +1097,48 @@ elif page == "🍽️ Meal Builder":
             )
             selections[meal_slot]["include"] = include_meal
 
-            for component_slot in COMPONENT_SLOTS:
-                st.markdown("<div class='component-block'>", unsafe_allow_html=True)
-                options = component_names(component_slot, meal_slot)
-                default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
-                default_index = options.index(default_name) if default_name in options else 0
+            cols = st.columns(4)
+            for i, component_slot in enumerate(COMPONENT_SLOTS):
+                with cols[i]:
+                    options = component_names(component_slot, meal_slot)
+                    default_name = saved_defaults.get((meal_slot, component_slot), DEFAULT_DAY_PLAN[meal_slot][component_slot])
+                    default_index = options.index(default_name) if default_name in options else 0
 
-                chosen = st.selectbox(
-                    component_slot,
-                    options,
-                    index=default_index,
-                    key=f"{selected_date}_{meal_slot}_{component_slot}"
-                )
+                    chosen = st.selectbox(
+                        component_slot,
+                        options,
+                        index=default_index,
+                        key=f"{selected_date}_{meal_slot}_{component_slot}"
+                    )
 
-                if chosen == "Other / Custom":
-                    st.caption("Enter custom nutrition values")
-                    custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
-                    custom_cal = st.number_input("Calories", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
-                    custom_pro = st.number_input("Protein (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
-                    custom_carbs = st.number_input("Carbs (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
-                    custom_fat = st.number_input("Fat (g)", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
-                    custom_cost = st.number_input("Cost ($)", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
-                    comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
-                else:
-                    comp = get_component(component_slot, chosen)
+                    if chosen == "Other / Custom":
+                        st.caption("Custom values")
+                        custom_name = st.text_input("Name", key=f"{selected_date}_{meal_slot}_{component_slot}_custom_name")
+                        custom_cal = st.number_input("Cal", min_value=0.0, value=0.0, step=10.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cal")
+                        custom_pro = st.number_input("Protein", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_pro")
+                        custom_carbs = st.number_input("Carbs", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_carbs")
+                        custom_fat = st.number_input("Fat", min_value=0.0, value=0.0, step=1.0, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_fat")
+                        custom_cost = st.number_input("Cost", min_value=0.0, value=0.0, step=0.25, key=f"{selected_date}_{meal_slot}_{component_slot}_custom_cost")
+                        comp = make_custom_component(custom_name, custom_cal, custom_pro, custom_carbs, custom_fat, custom_cost)
+                    else:
+                        comp = get_component(component_slot, chosen)
 
-                selections[meal_slot]["components"][component_slot] = comp
+                    selections[meal_slot]["components"][component_slot] = comp
 
-                st.markdown(
-                    f"""
-                    <div class="kpi-card">
-                        <b>{component_slot} KPI</b>
-                        <div class="component-full-name">{comp['name']}</div>
-                        {comp['calories']:.0f} cal<br>
-                        {comp['protein']:.0f}g protein<br>
-                        ${comp['cost']:.2f}
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
-                st.markdown("</div>", unsafe_allow_html=True)
+                    st.markdown(
+                        f"""
+                        <div class="compact-kpi">
+                            <b>{component_slot} KPI</b>
+                            <div class="compact-name">{comp['name']}</div>
+                            <div class="compact-macro">
+                                {comp['calories']:.0f} cal<br>
+                                {comp['protein']:.0f}g protein<br>
+                                ${comp['cost']:.2f}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True
+                    )
 
             if include_meal:
                 totals = totals_from_components(list(selections[meal_slot]["components"].values()))
