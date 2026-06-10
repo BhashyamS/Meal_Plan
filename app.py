@@ -1128,7 +1128,6 @@ elif page == "🍽️ Meal Builder":
                     st.markdown(
                         f"""
                         <div class="compact-kpi">
-                            <b>{component_slot} KPI</b>
                             <div class="compact-name">{comp['name']}</div>
                             <div class="compact-macro">
                                 {comp['calories']:.0f} cal<br>
