@@ -1539,7 +1539,7 @@ def render_shopping_card(row, key_prefix):
 # =========================================================
 # GROCERY + SHOPPING PAGE
 # =========================================================
-elif page == "🛒 Grocery + Shopping":
+if page == "🛒 Grocery + Shopping":
     st.subheader("Grocery + Shopping")
 
     weekly_budget = st.number_input("Weekly budget", min_value=50, max_value=500, value=CLIENT["weekly_budget"], step=5, key="grocery_budget")
@@ -1717,7 +1717,7 @@ elif page == "🛒 Grocery + Shopping":
 # =========================================================
 # HISTORY + BUDGET PAGE
 # =========================================================
-elif page == "📊 History + Budget":
+if page == "📊 History + Budget":
     st.subheader("Previous Days + Budget Tracking")
 
     if google_sheets_is_configured():
