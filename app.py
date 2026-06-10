@@ -253,27 +253,77 @@ def google_sheets_is_configured():
         gspread is not None
         and Credentials is not None
         and "gcp_service_account" in st.secrets
-        and "spreadsheet_name" in st.secrets
+        and ("spreadsheet_name" in st.secrets or "spreadsheet_id" in st.secrets)
     )
 
 @st.cache_resource(show_spinner=False)
 def get_spreadsheet():
+    """
+    Connects to the exact Google Sheet.
+    Preferred: add spreadsheet_id to Streamlit secrets.
+    Fallback: spreadsheet_name.
+    """
     if not google_sheets_is_configured():
         return None
 
     creds = Credentials.from_service_account_info(dict(st.secrets["gcp_service_account"]), scopes=SCOPE)
     client = gspread.authorize(creds)
-    sheet_name = st.secrets["spreadsheet_name"]
+
+    # BEST OPTION: exact file ID from the Google Sheet URL
+    spreadsheet_id = st.secrets.get("spreadsheet_id", "")
+    if spreadsheet_id:
+        try:
+            return client.open_by_key(spreadsheet_id)
+        except Exception:
+            return None
+
+    # Fallback: spreadsheet name. This can accidentally open/create the wrong file
+    # if there are duplicates or the service account cannot access the intended sheet.
+    sheet_name = st.secrets.get("spreadsheet_name", "")
+    if not sheet_name:
+        return None
 
     try:
         return client.open(sheet_name)
     except gspread.SpreadsheetNotFound:
-        return client.create(sheet_name)
+        try:
+            return client.create(sheet_name)
+        except Exception:
+            return None
+
+def visible_worksheet_titles(spreadsheet):
+    try:
+        return [ws.title for ws in spreadsheet.worksheets()]
+    except Exception:
+        return []
+
+def find_worksheet(spreadsheet, title):
+    """
+    Finds a worksheet by exact title or by trimmed/lowercase title.
+    This helps if Google Sheets has accidental spaces in the tab name.
+    """
+    try:
+        return spreadsheet.worksheet(title)
+    except Exception:
+        pass
+
+    wanted = str(title).strip().lower()
+    try:
+        for ws in spreadsheet.worksheets():
+            if str(ws.title).strip().lower() == wanted:
+                return ws
+    except Exception:
+        return None
+
+    return None
 
 def get_or_create_worksheet(spreadsheet, title, headers):
-    try:
-        ws = spreadsheet.worksheet(title)
-    except Exception:
+    if spreadsheet is None:
+        return None
+
+    ws = find_worksheet(spreadsheet, title)
+
+    if ws is None:
         try:
             ws = spreadsheet.add_worksheet(title=title, rows=100, cols=max(12, len(headers)))
             ws.update("A1", [headers])
@@ -323,6 +373,11 @@ def read_sheet(title, headers):
     ws = get_or_create_worksheet(ss, title, headers)
     if ws is None:
         st.info(f"Google Sheet tab '{title}' is not ready yet.")
+        try:
+            st.caption(f"Connected spreadsheet: {ss.title} | ID: {ss.id}")
+            st.caption("Tabs visible to the app: " + ", ".join(visible_worksheet_titles(ss)))
+        except Exception:
+            pass
         return pd.DataFrame(columns=headers)
 
     try:
@@ -1320,12 +1375,26 @@ elif page == "📊 History + Budget":
     if google_sheets_is_configured():
         with st.expander("Google Sheets Setup / Repair", expanded=False):
             st.caption("Use this only if Google Sheets tabs are missing or broken.")
+            if st.button("Show Connected Google Sheet Info"):
+                ss = get_spreadsheet()
+                if ss is None:
+                    st.error("Could not connect to a spreadsheet. Check spreadsheet_id/spreadsheet_name and service account sharing.")
+                else:
+                    st.success(f"Connected to: {ss.title}")
+                    st.code(f"Spreadsheet ID: {ss.id}")
+                    st.write("Tabs visible to the app:")
+                    st.write(visible_worksheet_titles(ss))
+
             if st.button("Create / Repair Required Google Sheet Tabs"):
                 ok, msg = setup_required_tabs()
                 if ok:
                     st.success(msg)
                 else:
+                    ss = get_spreadsheet()
                     st.error(str(msg))
+                    if ss is not None:
+                        st.caption(f"Connected spreadsheet: {ss.title} | ID: {ss.id}")
+                        st.caption("Tabs visible to the app: " + ", ".join(visible_worksheet_titles(ss)))
 
             st.markdown("#### Manual setup headers")
             st.caption("If repair fails, manually create these tabs in Google Sheets and paste the matching header into row 1.")
