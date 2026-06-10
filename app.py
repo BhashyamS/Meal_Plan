@@ -223,6 +223,39 @@ st.markdown("""
             flex: 1 1 100% !important;
         }
     }
+
+    .shopping-card {
+        background: var(--kpi-bg);
+        color: var(--kpi-text);
+        border: 1px solid var(--kpi-border);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px var(--shadow);
+    }
+    .shopping-title {
+        font-size: 16px;
+        font-weight: 850;
+        color: var(--honey);
+        margin-bottom: 6px;
+    }
+    .shopping-meta {
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--app-text);
+        margin-bottom: 8px;
+    }
+    .cart-card {
+        background: var(--success-bg);
+        color: var(--success-text);
+        border: 1px solid var(--success-border);
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 16px;
+        margin-bottom: 16px;
+        font-weight: 800;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1427,6 +1460,82 @@ elif page == "🍽️ Meal Builder":
                     st.warning(msg)
 
 
+
+def category_section_label(category):
+    c = str(category).strip().lower()
+    if c == "monthly":
+        return "📦 Monthly"
+    if c == "weekly":
+        return "🛒 Weekly"
+    return "✨ As Needed"
+
+def normalized_category(category):
+    c = str(category).strip().lower()
+    if c == "monthly":
+        return "Monthly"
+    if c == "weekly":
+        return "Weekly"
+    return "As Needed"
+
+def render_shopping_card(row, key_prefix):
+    """
+    Renders one mobile-friendly shopping card.
+    Returns a dict row for saving if selected.
+    """
+    item = str(row.get("Item", "")).strip()
+    category = str(row.get("Category", "")).strip()
+    suggested_buy = str(row.get("Suggested Buy", item)).strip()
+    where = str(row.get("Where to Buy", "")).strip()
+    unit = str(row.get("Unit", "")).strip()
+    storage = str(row.get("Storage", "")).strip()
+    low_stock_at = float(pd.to_numeric(row.get("Low Stock At", 0), errors="coerce") or 0)
+    suggested_qty = float(pd.to_numeric(row.get("Suggested Qty", 0), errors="coerce") or 0)
+    default_price = float(pd.to_numeric(row.get("Default Price", 0), errors="coerce") or 0)
+    default_unit_price = round(default_price / suggested_qty, 2) if suggested_qty > 0 else default_price
+
+    safe_key = "".join(ch if ch.isalnum() else "_" for ch in f"{key_prefix}_{item}_{category}")
+
+    st.markdown(
+        f"""
+        <div class="shopping-card">
+            <div class="shopping-title">{item}</div>
+            <div class="shopping-meta">
+                <b>Suggested Buy:</b> {suggested_buy}<br>
+                <b>Where:</b> {where}<br>
+                <b>Suggested Qty:</b> {suggested_qty:g} {unit}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    c1, c2, c3 = st.columns([0.8, 1, 1])
+    with c1:
+        buy = st.checkbox("Buy", value=False, key=f"{safe_key}_buy")
+    with c2:
+        qty = st.number_input("Qty", min_value=0.0, value=float(suggested_qty), step=1.0, key=f"{safe_key}_qty")
+    with c3:
+        unit_price = st.number_input("Price", min_value=0.0, value=float(default_unit_price), step=0.25, key=f"{safe_key}_price", format="%.2f")
+
+    total = round(float(qty) * float(unit_price), 2)
+    st.caption(f"Line total: ${total:.2f}")
+
+    if buy and qty > 0:
+        return {
+            "item": item,
+            "category": category,
+            "qty_bought": qty,
+            "unit": unit,
+            "unit_price": unit_price,
+            "total_cost": total,
+            "storage": storage,
+            "low_stock_at": low_stock_at,
+            "suggested_buy": suggested_buy,
+            "where_to_buy": where,
+        }
+    return None
+
+
 # =========================================================
 # GROCERY + SHOPPING PAGE
 # =========================================================
@@ -1469,137 +1578,130 @@ elif page == "🛒 Grocery + Shopping":
             })
 
             base = enrich_grocery_for_shopping(base)
+            base["Category_Normalized"] = base["Category"].apply(normalized_category)
 
-            base["Buy"] = False
-            base["Suggested Qty"] = pd.to_numeric(base["Suggested Qty"], errors="coerce").fillna(0)
-            base["Default Price"] = pd.to_numeric(base["Default Price"], errors="coerce").fillna(0)
-            base["Qty Bought"] = base["Suggested Qty"]
-            base["Unit Price"] = base.apply(
-                lambda r: round(float(r["Default Price"]) / float(r["Suggested Qty"]), 2) if float(r["Suggested Qty"]) > 0 else 0,
-                axis=1
-            )
-            base["Total Cost"] = base["Qty Bought"] * base["Unit Price"]
+            selected_rows = []
 
-            compact_cols = ["Buy", "Item", "Suggested Buy", "Where to Buy", "Qty Bought", "Unit Price", "Total Cost"]
+            with st.expander("📦 Monthly", expanded=False):
+                monthly = base[base["Category_Normalized"] == "Monthly"].copy()
+                if monthly.empty:
+                    st.info("No monthly items.")
+                else:
+                    for idx, row in monthly.iterrows():
+                        result = render_shopping_card(row, f"monthly_{idx}")
+                        if result:
+                            selected_rows.append(result)
 
-            def shopping_editor(section_label, df_section, key_suffix):
-                st.markdown(f"### {section_label}")
-                if df_section.empty:
-                    st.info(f"No {section_label.lower()} items.")
-                    return pd.DataFrame(columns=base.columns)
+            with st.expander("🛒 Weekly", expanded=True):
+                weekly = base[base["Category_Normalized"] == "Weekly"].copy()
+                if weekly.empty:
+                    st.info("No weekly items.")
+                else:
+                    for idx, row in weekly.iterrows():
+                        result = render_shopping_card(row, f"weekly_{idx}")
+                        if result:
+                            selected_rows.append(result)
 
-                edited_section = st.data_editor(
-                    df_section[compact_cols],
-                    use_container_width=True,
-                    hide_index=True,
-                    num_rows="dynamic",
-                    height=min(420, 72 + 36 * max(len(df_section), 2)),
-                    key=f"shopping_editor_{key_suffix}",
-                    column_config={
-                        "Buy": st.column_config.CheckboxColumn("Buy", width="small"),
-                        "Item": st.column_config.TextColumn("Item", width="small"),
-                        "Suggested Buy": st.column_config.TextColumn("Suggested Buy", width="large"),
-                        "Where to Buy": st.column_config.TextColumn("Where", width="small"),
-                        "Qty Bought": st.column_config.NumberColumn("Qty", min_value=0.0, step=1.0, width="small"),
-                        "Unit Price": st.column_config.NumberColumn("Price", min_value=0.0, step=0.25, format="$%.2f", width="small"),
-                        "Total Cost": st.column_config.NumberColumn("Total", min_value=0.0, step=0.25, format="$%.2f", width="small"),
-                    },
-                    disabled=["Item", "Suggested Buy", "Where to Buy", "Total Cost"],
-                )
-
-                edited_section["Qty Bought"] = pd.to_numeric(edited_section["Qty Bought"], errors="coerce").fillna(0)
-                edited_section["Unit Price"] = pd.to_numeric(edited_section["Unit Price"], errors="coerce").fillna(0)
-                edited_section["Total Cost"] = (edited_section["Qty Bought"] * edited_section["Unit Price"]).round(2)
-
-                # Reattach hidden columns needed for inventory.
-                hidden = df_section[["Item", "Category", "Unit", "Storage", "Low Stock At", "Suggested Qty"]].copy()
-                merged = edited_section.merge(hidden, on="Item", how="left")
-                return merged
-
-            base["category_lower"] = base["Category"].astype(str).str.strip().str.lower()
-
-            monthly_base = base[base["category_lower"] == "monthly"].copy()
-            weekly_base = base[base["category_lower"] == "weekly"].copy()
-            as_needed_base = base[~base["category_lower"].isin(["monthly", "weekly"])].copy()
-
-            edited_monthly = shopping_editor("🗓️ Monthly", monthly_base, "monthly")
-            edited_weekly = shopping_editor("📅 Weekly", weekly_base, "weekly")
-            edited_as_needed = shopping_editor("✨ As Needed", as_needed_base, "as_needed")
-
-            edited = pd.concat([edited_monthly, edited_weekly, edited_as_needed], ignore_index=True)
-            if not edited.empty:
-                edited["Buy"] = edited["Buy"].fillna(False)
-                edited["Qty Bought"] = pd.to_numeric(edited["Qty Bought"], errors="coerce").fillna(0)
-                edited["Unit Price"] = pd.to_numeric(edited["Unit Price"], errors="coerce").fillna(0)
-                edited["Total Cost"] = (edited["Qty Bought"] * edited["Unit Price"]).round(2)
-
-            selected = edited[(edited["Buy"] == True) & (edited["Qty Bought"] > 0)].copy() if not edited.empty else pd.DataFrame()
-            total = float(selected["Total Cost"].sum()) if not selected.empty else 0
-
-            st.markdown("---")
-            st.metric("Shopping Total", f"${total:.2f}")
-            if not selected.empty:
-                st.caption("Selected items only:")
-                st.dataframe(selected[["Item", "Suggested Buy", "Where to Buy", "Qty Bought", "Unit Price", "Total Cost"]], use_container_width=True, hide_index=True)
+            with st.expander("✨ As Needed", expanded=False):
+                as_needed = base[base["Category_Normalized"] == "As Needed"].copy()
+                if as_needed.empty:
+                    st.info("No as-needed items.")
+                else:
+                    for idx, row in as_needed.iterrows():
+                        result = render_shopping_card(row, f"as_needed_{idx}")
+                        if result:
+                            selected_rows.append(result)
 
             st.markdown("### Add One-Off Shopping Item")
             with st.expander("➕ Add to this shopping trip only", expanded=False):
                 custom_item = st.text_input("Item")
-                custom_qty = st.number_input("Qty", min_value=0.0, value=0.0, step=1.0)
-                custom_unit = st.text_input("Unit", value="serving")
-                custom_unit_price = st.number_input("Unit Price", min_value=0.0, value=0.0, step=0.25)
+                custom_suggested = st.text_input("Suggested Buy / Product Name")
+                custom_where = st.text_input("Where to Buy", value="Costco or Sprouts")
+                custom_qty = st.number_input("Qty", min_value=0.0, value=0.0, step=1.0, key="custom_qty_card")
+                custom_unit = st.text_input("Backend Unit", value="serving")
+                custom_unit_price = st.number_input("Price", min_value=0.0, value=0.0, step=0.25, key="custom_price_card")
+
+            if custom_item and custom_qty > 0:
+                selected_rows.append({
+                    "item": custom_item,
+                    "category": "As Needed",
+                    "qty_bought": custom_qty,
+                    "unit": custom_unit,
+                    "unit_price": custom_unit_price,
+                    "total_cost": round(custom_qty * custom_unit_price, 2),
+                    "storage": "",
+                    "low_stock_at": 1,
+                    "suggested_buy": custom_suggested or custom_item,
+                    "where_to_buy": custom_where,
+                })
+
+            selected_df = pd.DataFrame(selected_rows)
+            monthly_total = float(selected_df[selected_df["category"].astype(str).str.lower() == "monthly"]["total_cost"].sum()) if not selected_df.empty else 0
+            weekly_total = float(selected_df[selected_df["category"].astype(str).str.lower() == "weekly"]["total_cost"].sum()) if not selected_df.empty else 0
+            as_needed_total = float(selected_df[~selected_df["category"].astype(str).str.lower().isin(["monthly", "weekly"])]["total_cost"].sum()) if not selected_df.empty else 0
+            total = monthly_total + weekly_total + as_needed_total
+
+            st.markdown(
+                f"""
+                <div class="cart-card">
+                    🧾 Shopping Cart<br><br>
+                    Monthly: ${monthly_total:.2f}<br>
+                    Weekly: ${weekly_total:.2f}<br>
+                    As Needed: ${as_needed_total:.2f}<br>
+                    <hr>
+                    Total: ${total:.2f}
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            if not selected_df.empty:
+                st.caption("Selected items:")
+                st.dataframe(
+                    selected_df[["item", "suggested_buy", "where_to_buy", "qty_bought", "unit_price", "total_cost"]],
+                    use_container_width=True,
+                    hide_index=True
+                )
 
             if st.button("✅ End Shopping Mode + Save Purchases", use_container_width=True):
-                rows = []
-                shopping_id = datetime.now().strftime("%Y%m%d%H%M%S")
-                saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-                for _, r in selected.iterrows():
-                    rows.append({
-                        "shopping_id": shopping_id,
-                        "saved_at": saved_at,
-                        "item": r["Item"],
-                        "category": r.get("Category", ""),
-                        "qty_bought": r["Qty Bought"],
-                        "unit": r["Unit"],
-                        "unit_price": r["Unit Price"],
-                        "total_cost": r["Total Cost"],
-                        "storage": r.get("Storage", ""),
-                        "low_stock_at": r.get("Low Stock At", 0),
-                    })
-
-                if custom_item and custom_qty > 0:
-                    rows.append({
-                        "shopping_id": shopping_id,
-                        "saved_at": saved_at,
-                        "item": custom_item,
-                        "category": "As needed",
-                        "qty_bought": custom_qty,
-                        "unit": custom_unit,
-                        "unit_price": custom_unit_price,
-                        "total_cost": custom_qty * custom_unit_price,
-                        "storage": "",
-                        "low_stock_at": 1,
-                    })
-
-                if not rows:
+                if selected_df.empty:
                     st.warning("No purchased items selected.")
                 else:
-                    trip_df = pd.DataFrame(rows)
+                    shopping_id = datetime.now().strftime("%Y%m%d%H%M%S")
+                    saved_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                    save_rows = []
+                    for _, r in selected_df.iterrows():
+                        save_rows.append({
+                            "shopping_id": shopping_id,
+                            "saved_at": saved_at,
+                            "item": r["item"],
+                            "category": r["category"],
+                            "qty_bought": r["qty_bought"],
+                            "unit": r["unit"],
+                            "unit_price": r["unit_price"],
+                            "total_cost": r["total_cost"],
+                            "storage": r["storage"],
+                        })
+
+                    trip_df = pd.DataFrame(save_rows)
                     append_df = trip_df[shopping_headers()]
                     ok, msg = append_sheet("Shopping_Trips", shopping_headers(), append_df)
 
                     if ok:
-                        update_inventory_with_purchase(trip_df.rename(columns={
-                            "item": "item",
-                            "category": "category",
-                            "qty_bought": "qty_bought",
-                            "unit": "unit",
-                            "unit_price": "unit_price",
-                            "storage": "storage",
-                            "low_stock_at": "low_stock_at",
-                        }))
-                        save_budget_entry(date.today(), "Shopping Trip", "Shopping mode purchase", float(trip_df["total_cost"].sum()))
+                        update_inventory_with_purchase(pd.DataFrame([
+                            {
+                                "item": r["item"],
+                                "category": r["category"],
+                                "qty_bought": r["qty_bought"],
+                                "unit": r["unit"],
+                                "unit_price": r["unit_price"],
+                                "storage": r["storage"],
+                                "low_stock_at": r["low_stock_at"],
+                            }
+                            for _, r in selected_df.iterrows()
+                        ]))
+                        save_budget_entry(date.today(), "Shopping Trip", "Shopping mode purchase", float(total))
                         st.success("Shopping trip saved and inventory updated.")
                     else:
                         st.warning(msg)
