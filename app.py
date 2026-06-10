@@ -542,6 +542,8 @@ def read_food_options():
     df["ingredient_name"] = df["ingredient_name"].astype(str).fillna("").str.strip()
     df["ingredient_unit"] = df["ingredient_unit"].astype(str).fillna("").str.strip()
 
+    df = duplicate_home_components_for_lunch(df)
+
     return df
 
 @st.cache_data(ttl=60)
@@ -648,6 +650,57 @@ def display_component_name(component):
         "Dessert/Treat": "Dessert",
     }
     return names.get(component, component.replace("_", " "))
+
+def component_filter_for_meal(meal_slot, mode=None):
+    """
+    Controls which component dropdowns appear for each meal.
+    Lunch has two modes:
+    - Restaurant: Drink, Restaurant_Main, Side, Dessert
+    - Home: Drink, Protein, Carb_Meal, Side, Dessert
+    Dinner stays home-style by default.
+    """
+    if meal_slot == "Lunch":
+        if mode == "Restaurant":
+            return ["Drink", "Restaurant_Main", "Side", "Dessert"]
+        if mode == "Home":
+            return ["Drink", "Protein", "Carb_Meal", "Side", "Dessert"]
+    return None
+
+def duplicate_home_components_for_lunch(food_df):
+    """
+    Lets Lunch Home mode reuse Dinner Protein + Carb_Meal options without requiring
+    duplicate rows in the Food_Options sheet.
+    """
+    if food_df.empty:
+        return food_df
+
+    additions = []
+
+    dinner_home = food_df[
+        (food_df["meal_slot"] == "Dinner")
+        & (food_df["component_slot"].isin(["Protein", "Carb_Meal"]))
+    ].copy()
+
+    if not dinner_home.empty:
+        lunch_existing = set(
+            zip(
+                food_df["meal_slot"].astype(str),
+                food_df["component_slot"].astype(str),
+                food_df["option_name"].astype(str),
+            )
+        )
+
+        for _, row in dinner_home.iterrows():
+            new_row = row.copy()
+            new_row["meal_slot"] = "Lunch"
+            key = ("Lunch", str(new_row["component_slot"]), str(new_row["option_name"]))
+            if key not in lunch_existing:
+                additions.append(new_row)
+
+    if additions:
+        food_df = pd.concat([food_df, pd.DataFrame(additions)], ignore_index=True)
+
+    return food_df
 
 def get_components_for_meal(food_df, meal_slot):
     components = (
@@ -1164,8 +1217,8 @@ elif page == "🍽️ Meal Builder":
         available_meals += extra_meals
 
         for meal_slot in available_meals:
-            components = get_components_for_meal(food_df, meal_slot)
-            if not components:
+            all_components_for_meal = get_components_for_meal(food_df, meal_slot)
+            if not all_components_for_meal:
                 continue
 
             selections[meal_slot] = {"include": False, "components": {}}
@@ -1173,6 +1226,31 @@ elif page == "🍽️ Meal Builder":
             with st.expander(meal_slot, expanded=True):
                 include = st.checkbox(f"Include {meal_slot}", value=False, key=f"{selected_date}_{meal_slot}_include")
                 selections[meal_slot]["include"] = include
+
+                mode = None
+                if meal_slot == "Lunch":
+                    if f"{selected_date}_Lunch_mode" not in st.session_state:
+                        st.session_state[f"{selected_date}_Lunch_mode"] = "Restaurant"
+
+                    mode_cols = st.columns(2)
+                    with mode_cols[0]:
+                        if st.button("🍽️ Restaurant", key=f"{selected_date}_Lunch_restaurant_btn", use_container_width=True):
+                            st.session_state[f"{selected_date}_Lunch_mode"] = "Restaurant"
+                    with mode_cols[1]:
+                        if st.button("🏠 Home", key=f"{selected_date}_Lunch_home_btn", use_container_width=True):
+                            st.session_state[f"{selected_date}_Lunch_mode"] = "Home"
+
+                    mode = st.session_state[f"{selected_date}_Lunch_mode"]
+                    st.markdown(
+                        f"<div class='soft-warning'><b>Lunch Mode:</b> {mode}</div>",
+                        unsafe_allow_html=True
+                    )
+
+                allowed_components = component_filter_for_meal(meal_slot, mode)
+                if allowed_components is not None:
+                    components = [c for c in allowed_components if c in all_components_for_meal]
+                else:
+                    components = all_components_for_meal
 
                 # Responsive compact columns, max 4 per row.
                 for start_idx in range(0, len(components), 4):
@@ -1189,7 +1267,6 @@ elif page == "🍽️ Meal Builder":
                             if not defaults.empty:
                                 default_name = str(defaults.iloc[0]["option_name"])
                             else:
-                                # If no default is set, prefer None.
                                 none_rows = opts[opts["option_name"].astype(str).str.lower() == "none"]
                                 default_name = str(none_rows.iloc[0]["option_name"]) if not none_rows.empty else names[0]
 
@@ -1200,7 +1277,7 @@ elif page == "🍽️ Meal Builder":
                                 display_component_name(component_slot),
                                 names,
                                 index=default_index,
-                                key=f"{selected_date}_{meal_slot}_{component_slot}"
+                                key=f"{selected_date}_{meal_slot}_{mode or 'Default'}_{component_slot}"
                             )
 
                             row = opts[opts["option_name"].astype(str) == chosen].iloc[0]
